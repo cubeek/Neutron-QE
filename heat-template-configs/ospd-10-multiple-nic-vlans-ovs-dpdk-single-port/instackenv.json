@@ -1,0 +1,30 @@
+{
+    "nodes":[
+        {
+            "mac":[
+                "84:8f:69:fb:c7:27"
+            ],
+            "cpu":"16",
+            "memory":"66560",
+            "disk":"150",
+            "arch":"x86_64",
+            "pm_type":"pxe_ipmitool",
+            "pm_user":"root",
+            "pm_password":"calvin",
+            "pm_addr":"10.35.160.184"
+        },
+        {
+            "mac":[
+                "24:b6:fd:ff:bc:6c"
+            ],
+            "cpu":"16",
+            "memory":"66560",
+            "disk":"150",
+            "arch":"x86_64",
+            "pm_type":"pxe_ipmitool",
+            "pm_user":"root",
+            "pm_password":"calvin",
+            "pm_addr":"10.35.160.194"
+        }
+    ]
+}
