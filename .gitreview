@@ -1,0 +1,6 @@
+[gerrit]
+host=code.engineering.redhat.com
+port=22
+project=Neutron-QE.git
+defaultremote=origin
+defaultbranch=master
