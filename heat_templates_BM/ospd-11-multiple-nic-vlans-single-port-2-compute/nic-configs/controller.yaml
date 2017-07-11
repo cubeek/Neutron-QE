@@ -121,12 +121,22 @@ resources:
                   ip_netmask: {get_param: ExternalIpSubnet}
             -
               type: ovs_bridge
-              name: br-link
+              name: br-link1
               use_dhcp: false
               members:
                 -
                   type: interface
                   name: enp4s0f0
+                  mtu: 5000
+            -
+              type: ovs_bridge
+              name: br-link2
+              use_dhcp: false
+              members:
+                -
+                  type: interface
+                  name: enp5s0f0
+                  mtu: 4000
             -
               type: ovs_bridge
               name: br-external

@@ -69,9 +69,15 @@ parameter_defaults:
   # The tenant network type for Neutron (vlan or vxlan).
   NeutronNetworkType: 'vlan'
   # The OVS logical->physical bridge mappings to use.
-  NeutronBridgeMappings: 'datacentre:br-external,tenant:br-link'
+  #NeutronBridgeMappings: 'datacentre:br-external,tenant:br-link'
   # The Neutron ML2 and OpenVSwitch vlan mapping range to support.
-  NeutronNetworkVLANRanges: 'datacentre:181:181,tenant:224:227'
+  #NeutronNetworkVLANRanges: 'datacentre:181:181,tenant:224:227'
+  #NeutronBridgeMappings: 'datacentre:br-external,tenant:br-link1,tenant:br-link2'
+  # The Neutron ML2 and OpenVSwitch vlan mapping range to support.
+  #NeutronNetworkVLANRanges: 'datacentre:181:181,tenant:224:227'
+  NeutronBridgeMappings: 'datacentre:br-external,tenant1:br-link1,tenant2:br-link2'
+  # The Neutron ML2 and OpenVSwitch vlan mapping range to support.
+  NeutronNetworkVLANRanges: 'datacentre:181:181,tenant1:224:225,tenant2:226:227'
   # Nova flavor to use.
   OvercloudControlFlavor: controller
   OvercloudComputeFlavor: compute

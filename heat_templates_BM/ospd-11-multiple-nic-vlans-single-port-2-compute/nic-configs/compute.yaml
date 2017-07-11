@@ -119,14 +119,24 @@ resources:
                   ip_netmask: {get_param: TenantIpSubnet}
             -
               type: ovs_bridge
-              name: br-link
+              name: br-link1
               use_dhcp: false
               dns_servers: {get_param: DnsServers}
               members:
                 -
                   type: interface
                   name: p1p1
-            
+                  mtu: 5000
+            -
+              type: ovs_bridge
+              name: br-link2
+              use_dhcp: false
+              dns_servers: {get_param: DnsServers}
+              members:
+                -
+                  type: interface
+                  name: em2
+                  mtu: 4000
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.
