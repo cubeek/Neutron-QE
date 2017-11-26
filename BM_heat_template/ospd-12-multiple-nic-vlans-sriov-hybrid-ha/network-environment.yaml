@@ -8,7 +8,7 @@ parameter_defaults:
   InternalApiNetCidr: 10.35.1.0/24
   TenantNetCidr: 10.35.2.0/24
   ExternalNetCidr: 10.35.166.0/24
-  sStorageNetCidr: 10.35.3.0/24
+  StorageNetCidr: 10.35.3.0/24
   StorageMgmtNetCidr: 10.35.4.0/24
   # CIDR subnet mask length for provisioning network
   ControlPlaneSubnetCidr: '24'
