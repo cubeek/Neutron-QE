@@ -2,7 +2,6 @@ resource_registry:
   # Specify the relative/absolute path to the config files you want to use for override the default.
   OS::TripleO::Compute::Net::SoftwareConfig: nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
-
 parameter_defaults:
   # Customize all these values to match the local environment
   InternalApiNetCidr: 10.35.1.0/24
@@ -59,5 +58,5 @@ parameter_defaults:
   NeutronPhysicalDevMappings: "datacentre:p1p1"
   NeutronSriovNumVFs: "p1p1:5"
   #ComputeKernelArgs: "intel_iommu=on default_hugepagesz=1GB hugepagesz=1G hugepages=12"
-  ComputeParameters:
-    KernelArgs: default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on
+  #ComputeParameters:
+  #  KernelArgs: "iommu=pt intel_iommu=on"
