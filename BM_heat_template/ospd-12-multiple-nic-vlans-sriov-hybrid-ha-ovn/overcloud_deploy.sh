@@ -3,7 +3,7 @@
 
 openstack overcloud deploy  \
 --templates \
---timeout 75 \
+--timeout 120 \
 -r /home/stack/ospd-12-multiple-nic-vlans-sriov-hybrid-ha-ovn/roles_data.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
