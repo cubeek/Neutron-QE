@@ -25,6 +25,14 @@ parameters:
     default: ''
     description: IP address/subnet on the storage mgmt network
     type: string
+  StorageNetworkVlanID:
+    default: ''
+    description: IP address/subnet on the storage mgmt network
+    type: number
+  StorageMgmtNetworkVlanID:
+    default: ''
+    description: IP address/subnet on the storage mgmt network
+    type: number
   TenantIpSubnet:
     default: ''
     description: IP address/subnet on the tenant network
@@ -81,7 +89,7 @@ resources:
           network_config:
             -
               type: interface
-              name: enp5s0f1
+              name: nic1
               use_dhcp: false
               dns_servers: {get_param: DnsServers}
               addresses:
@@ -101,24 +109,32 @@ resources:
             -
               type: vlan
               vlan_id: {get_param: InternalApiNetworkVlanID}
-              device: enp5s0f1
+              device: nic1
               addresses:
                 -
                   ip_netmask: {get_param: InternalApiIpSubnet}
             -
               type: vlan
               vlan_id: {get_param: TenantNetworkVlanID}
-              device: enp5s0f1
+              device: nic1
               addresses:
                 -
                   ip_netmask: {get_param: TenantIpSubnet}
             -
               type: vlan
-              vlan_id: {get_param: ExternalNetworkVlanID}
-              device: enp5s0f1
+              vlan_id: {get_param: StorageNetworkVlanID}
+              device: nic1
               addresses:
                 -
-                  ip_netmask: {get_param: ExternalIpSubnet}
+                  ip_netmask: {get_param: StorageIpSubnet}
+            -
+              type: vlan
+              vlan_id: {get_param: StorageMgmtNetworkVlanID}
+              device: nic1
+              addresses:
+                -
+                  ip_netmask: {get_param: StorageMgmtIpSubnet}
+
             -
               type: ovs_bridge
               name: br-sriov
@@ -126,15 +142,18 @@ resources:
               members:
                 -
                   type: interface
-                  name: enp4s0f0
-            -
-              type: ovs_bridge
-              name: br-external
-              use_dhcp: false
-              members:
+                  name: nic2
                 -
-                  type: interface
-                  name: enp4s0f1
+                  type: vlan
+                  vlan_id: {get_param: ExternalNetworkVlanID}
+                  addresses:
+                    -
+                      ip_netmask: {get_param: ExternalIpSubnet}
+                  routes:
+                    -
+                      default: true
+                      next_hop: {get_param: ExternalInterfaceDefaultRoute}
+
 
 outputs:
   OS::stack_id:
