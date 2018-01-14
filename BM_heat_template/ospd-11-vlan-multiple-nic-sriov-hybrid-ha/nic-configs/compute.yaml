@@ -126,11 +126,7 @@ resources:
               device: em1
               addresses:
                 -
-<<<<<<< HEAD:BM_heat_template/ospd-11-multiple-nic-vlans-sriov-hybrid-ha/nic-configs/compute.yaml
                   ip_netmask: {get_param: StorageMgmtIpSubnet}
-=======
-                  ip_netmask: {get_param: StorageMgmtIpSubnet} 
->>>>>>> 41cb620... Editing path of SRIOV templates:BM_heat_template/ospd-11-vlan-multiple-nic-sriov-hybrid-ha/nic-configs/compute.yaml
             -
               type: ovs_bridge
               name: br-ext-int
