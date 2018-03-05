@@ -75,7 +75,7 @@ parameter_defaults:
   NeutronExternalNetworkBridge: "''"
   NeutronNetworkType: 'vlan,flat'
   NeutronTunnelTypes: ''
-  NeutronBridgeMappings: 'datacentre:br-ext-int'
+  NeutronBridgeMappings: 'datacentre:br-sriov'
   NeutronNetworkVLANRanges: 'datacentre:181:181,datacentre:225:228'
   OvercloudControlFlavor: controller
   OvercloudComputeFlavor: compute

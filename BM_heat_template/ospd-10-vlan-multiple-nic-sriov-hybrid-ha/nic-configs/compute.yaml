@@ -129,7 +129,7 @@ resources:
                   ip_netmask: {get_param: StorageMgmtIpSubnet}                                      
             -
               type: ovs_bridge
-              name: br-ext-int
+              name: br-sriov
               use_dhcp: false
               dns_servers: {get_param: DnsServers}
               members:
