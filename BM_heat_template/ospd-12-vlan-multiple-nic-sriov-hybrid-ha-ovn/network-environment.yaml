@@ -62,3 +62,4 @@ parameter_defaults:
   ComputeParameters:
     KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
     #KernelArgs: "iommu=pt intel_iommu=on"
+    #NeutronBridgeMappings: 'datacentre:br-ext-int'
