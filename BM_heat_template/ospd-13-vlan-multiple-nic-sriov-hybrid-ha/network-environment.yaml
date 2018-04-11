@@ -1,0 +1,63 @@
+resource_registry:
+  # Specify the relative/absolute path to the config files you want to use for override the default.
+  OS::TripleO::Compute::Net::SoftwareConfig: nic-configs/compute.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
+parameter_defaults:
+  # Customize all these values to match the local environment
+  InternalApiNetCidr: 10.35.1.0/24
+  TenantNetCidr: 10.35.2.0/24
+  ExternalNetCidr: 10.35.166.0/24
+  StorageNetCidr: 10.35.3.0/24
+  StorageMgmtNetCidr: 10.35.4.0/24
+  # CIDR subnet mask length for provisioning network
+  ControlPlaneSubnetCidr: '24'
+  InternalApiAllocationPools: [{'start': '10.35.1.2', 'end': '10.35.1.20'}]
+  TenantAllocationPools: [{'start': '10.35.2.21', 'end': '10.35.2.40'}]
+  # Use an External allocation pool which will leave room for floating IPs
+  ExternalAllocationPools: [{'start': '10.35.166.41', 'end': '10.35.166.60'}]
+
+  StorageAllocationPools: [{'start': '10.35.3.61', 'end': '10.35.3.80'}]
+  StorageMgmtAllocationPools: [{'start': '10.35.4.81', 'end': '10.35.4.100'}]
+
+  # Set to the router gateway on the external network
+  ExternalInterfaceDefaultRoute: 10.35.166.254
+  # Gateway router for the provisioning network (or Undercloud IP)
+  ControlPlaneDefaultRoute: 192.168.24.1
+  # Generally the IP of the Undercloud
+  EC2MetadataIp: 192.168.24.1
+  InternalApiNetworkVlanID: 220
+  TenantNetworkVlanID: 221
+  ExternalNetworkVlanID: 181
+  StorageNetworkVlanID: 223
+  StorageMgmtNetworkVlanID: 224
+
+  DnsServers: ["10.35.28.28"]
+  NeutronExternalNetworkBridge: "''"
+  NeutronNetworkType: 'vlan,flat'
+  NeutronTunnelTypes: ''
+  NeutronBridgeMappings: 'datacentre:br-ext-int'
+  NeutronNetworkVLANRanges: 'datacentre:181:181,datacentre:225:228'
+  OvercloudControlFlavor: controller
+  OvercloudComputeFlavor: compute
+  # Number of nodes to deploy.
+  ControllerCount: 3
+  ComputeCount: 2
+  NtpServer: clock.redhat.com
+
+#### Extras ####
+  ControllerHostnameFormat: 'controller-%index%'
+  ComputeHostnameFormat: 'compute-%index%'
+  NeutronMechanismDrivers: "openvswitch,sriovnicswitch"
+  NovaPCIPassthrough:
+    - devname: "p1p1"
+      physical_network: "datacentre"
+      #vlan: [224, 228]
+  NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
+  NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','RamFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
+  NeutronSupportedPCIVendorDevs: ['8086:154d', '8086:10ed']
+  NeutronPhysicalDevMappings: "datacentre:p1p1"
+  NeutronSriovNumVFs: "p1p1:5"
+  #ComputeKernelArgs: "intel_iommu=on default_hugepagesz=1GB hugepagesz=1G hugepages=12"
+  ComputeParameters:
+    KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
+    #KernelArgs: "iommu=pt intel_iommu=on"
