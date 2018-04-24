@@ -37,7 +37,7 @@ parameter_defaults:
   NeutronNetworkType: 'vlan,geneve'
   NeutronTunnelTypes: ''
   NeutronBridgeMappings: 'datacentre:br-ext-int'
-  NeutronNetworkVLANRanges: 'datacentre:181:181,datacentre:225:228'
+  NeutronNetworkVLANRanges: 'datacentre:181:181,datacentre:225:229'
   OvercloudControlFlavor: controller
   OvercloudComputeFlavor: compute
   # Number of nodes to deploy.
