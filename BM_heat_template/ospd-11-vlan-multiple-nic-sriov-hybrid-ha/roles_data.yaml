@@ -95,7 +95,7 @@
     - OS::TripleO::Services::OctaviaHousekeeping
     - OS::TripleO::Services::OctaviaWorker
 
-- name: Compute
+- name: ComputeSriov
   CountDefault: 1
   disable_upgrade_deployment: True
   ServicesDefault:

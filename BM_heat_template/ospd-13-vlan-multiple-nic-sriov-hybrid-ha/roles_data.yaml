@@ -173,7 +173,7 @@
 ###############################################################################
 # Role: ComputeSriov                                                          #
 ###############################################################################
-- name: Compute
+- name: ComputeSriov
   description: |
     Compute SR-IOV Role
   CountDefault: 1

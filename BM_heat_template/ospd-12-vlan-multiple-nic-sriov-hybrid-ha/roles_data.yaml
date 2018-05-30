@@ -149,9 +149,9 @@
     - OS::TripleO::Services::Vpp
     - OS::TripleO::Services::Zaqar
 ###############################################################################
-# Role: Compute                                                               #
+# Role: ComputeSriov                                                          #
 ###############################################################################
-- name: Compute
+- name: ComputeSriov
   description: |
     Compute Sriov Node role
   CountDefault: 1

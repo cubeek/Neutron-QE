@@ -75,8 +75,8 @@
     - OS::TripleO::Services::FluentdClient
     - OS::TripleO::Services::VipHosts
 
-- name: Compute
-  HostnameFormatDefault: 'compute-%index%'
+- name: ComputeSriov
+  HostnameFormatDefault: 'computesriov-%index%'
   CountDefault: 1
   ServicesDefault:
     - OS::TripleO::Services::CACerts
