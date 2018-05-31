@@ -98,8 +98,8 @@ resources:
                   next_hop:
                     get_param: EC2MetadataIp
                 - next_hop:
-                    default: true
                     get_param: ControlPlaneDefaultRoute
+                  default: true
 
               - type: vlan
                 vlan_id:
