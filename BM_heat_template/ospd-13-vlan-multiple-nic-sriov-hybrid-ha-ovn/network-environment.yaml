@@ -3,17 +3,6 @@ resource_registry:
   OS::TripleO::ComputeSriov::Net::SoftwareConfig: nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
 
-  OS::TripleO::Docker::NeutronMl2PluginBase: ../../puppet/services/neutron-plugin-ml2-ovn.yaml
-  OS::TripleO::Services::ComputeNeutronCorePlugin: OS::Heat::None
-  OS::TripleO::Services::ComputeNeutronOvsAgent: OS::Heat::None
-  OS::TripleO::Services::NeutronL3Agent: OS::Heat::None
-  OS::TripleO::Services::NeutronMetadataAgent: OS::Heat::None
-  OS::TripleO::Services::NeutronOvsAgent: OS::Heat::None
-  OS::TripleO::Services::OVNController: ../../docker/services/ovn-controller.yaml
-  OS::TripleO::Services::OVNDBs: ../../docker/services/pacemaker/ovn-dbs.yaml
-  OS::TripleO::Services::OVNMetadataAgent: ../../docker/services/ovn-metadata.yaml
-  OS::TripleO::Services::NeutronDhcpAgent: ../../docker/services/neutron-dhcp.yaml
-
 parameter_defaults:
   # Customize all these values to match the local environment
   InternalApiNetCidr: 10.35.1.0/24
@@ -55,22 +44,6 @@ parameter_defaults:
   ControllerCount: 3
   ComputeSriovCount: 2
   NtpServer: clock.redhat.com
-
-###OVN###
-
-  ControllerParameters:
-      OVNCMSOptions: enable-chassis-as-gw
-  NetworkerParameters:
-      OVNCMSOptions: enable-chassis-as-gw
-  NeutronEnableDHCPAgent: true
-  NeutronPluginExtensions: qos,port_security,dns
-  NeutronServicePlugins: qos,ovn-router,trunk
-  NeutronTypeDrivers: vlan,flat
-  NeutronVniRanges:
-  - 1:65536
-  OVNNeutronSyncMode: log
-  OVNQosDriver: ovn-qos
-  OVNVifType: ovs
 
 ###EXTRA###
 

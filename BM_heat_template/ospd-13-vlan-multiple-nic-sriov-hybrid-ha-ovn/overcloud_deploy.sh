@@ -13,4 +13,5 @@ openstack overcloud deploy  \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovn/docker-images.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/neutron-ovn-ha.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovn/network-environment.yaml \
+-e /usr/share/openstack-tripleo-heat-templates/environments/services/neutron-ovn-sriov.yaml \
 --log-file overcloud_install.log &> overcloud_install.log
