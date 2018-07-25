@@ -96,7 +96,7 @@ openstack router add subnet Router_eNet subnet_6_1
 openstack router set --external-gateway $ext_net Router_eNet
 neutron router-gateway-set Router_eNet $ext_net 
 
-SecID=$(openstack port create  --network net-64-1 --vnic-type direct vf_sriov | awk -F'[ \t]*\\|[ \t]*' '/ security_groups / {print $3}')
+SecID=$(openstack port create  --network net-64-1 --vnic-type direct vf_sriov | awk -F'[ \t]*\\|[ \t]*' '/ security_group_ids / {print $3}')
 openstack port create  --network net-64-1 --vnic-type direct-physical PF_sriov
 openstack port create  --network net-64-1 normal
 
