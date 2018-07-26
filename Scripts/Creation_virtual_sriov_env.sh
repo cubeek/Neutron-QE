@@ -108,7 +108,7 @@ openstack security group rule create --protocol icmp --ingress --ethertype IPv6 
 openstack security group rule create --protocol tcp --ingress --ethertype IPv6 $SecID
 openstack security group rule create --protocol udp --ingress --ethertype IPv6 $SecID
 
-echo #cloud-config >>create_int.yaml
+echo '#cloud-config' >>create_int.yaml
 echo write_files: >>create_int.yaml
 echo  - path: "/etc/sysconfig/network-scripts/ifcfg-eth0."$vlan_tenant_id >>create_int.yaml
 echo    owner: "root" >>create_int.yaml
