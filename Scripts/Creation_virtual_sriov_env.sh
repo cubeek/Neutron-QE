@@ -108,19 +108,22 @@ openstack security group rule create --protocol icmp --ingress --ethertype IPv6 
 openstack security group rule create --protocol tcp --ingress --ethertype IPv6 $SecID
 openstack security group rule create --protocol udp --ingress --ethertype IPv6 $SecID
 
-echo '#cloud-config' >>create_int.yaml
-echo write_files: >>create_int.yaml
-echo  - path: "/etc/sysconfig/network-scripts/ifcfg-eth0."$vlan_tenant_id >>create_int.yaml
-echo    owner: "root" >>create_int.yaml
-echo    permissions: '777'>>create_int.yaml
-echo    content: | >>create_int.yaml
-echo      DEVICE="eth0."$vlan_tenant_id >>create_int.yaml
-echo      BOOTPROTO="dhcp" >>create_int.yaml
-echo      ONBOOT="yes" >>create_int.yaml
-echo      VLAN="yes" >>create_int.yaml
-echo      PERSISTENT_DHCLIENT="yes" >>create_int.yaml
-echo runcmd: >>create_int.yaml
-echo    - [ sh, -c , 'systemctl restart network' ] >>create_int.yaml
+FILE="create_int.yaml"
+/bin/cat <<EOM >$FILE
+#cloud-config
+write_files:
+  - path: /etc/sysconfig/network-scripts/ifcfg-eth0.$vlan_tenant_id
+    owner: "root"
+    permissions: "777"
+    content: |
+      DEVICE="eth0.$vlan_tenant_id"
+      BOOTPROTO="dhcp"
+      ONBOOT="yes"
+      VLAN="yes"
+      PERSISTENT_DHCLIENT="yes"
+runcmd:
+  - [ sh, -c , "systemctl restart network" ]
+EOM
 
 image_id=$(openstack image list | grep $image | head -1 | cut -d " " -f 2)
 #VF
