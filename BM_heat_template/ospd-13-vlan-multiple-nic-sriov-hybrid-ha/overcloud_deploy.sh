@@ -8,7 +8,7 @@ openstack overcloud deploy  \
 -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
--e /usr/share/openstack-tripleo-heat-templates/environments/services-docker/neutron-sriov.yaml \
+-e /usr/share/openstack-tripleo-heat-templates/environments/services/neutron-sriov.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha/docker-images.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha/network-environment.yaml \
