@@ -142,6 +142,7 @@ resources:
                   - type: interface
                     name: p1p2
                     primary: true
+                    mtu: 8900
 
               - type: interface
                 name: p1p1
@@ -149,6 +150,7 @@ resources:
                 defroute: false
                 nm_controlled: true
                 hotplug: true
+                mtu: 8900
 
 outputs:
   OS::stack_id:
