@@ -32,7 +32,7 @@ parameter_defaults:
   StorageNetworkVlanID: 223
   StorageMgmtNetworkVlanID: 224
 
-  DnsServers: ["10.35.28.28"]
+  DnsServers: ["10.46.0.31","10.46.0.32"]
   NeutronExternalNetworkBridge: "''"
   NeutronNetworkType: 'vlan,flat'
   NeutronTunnelTypes: ''
