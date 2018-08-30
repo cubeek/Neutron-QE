@@ -72,6 +72,11 @@ parameters:
   EC2MetadataIp: # Override this via parameter_defaults
     description: The IP address of the EC2 metadata server.
     type: string
+  ControlPlaneDefaultRoute:
+    default: ''
+    description: The default route of the control plane network. (The parameter
+      is automatically resolved from the ctlplane subnet's gateway_ip attribute.)
+    type: string
 
 resources:
   OsNetConfigImpl:
