@@ -1,12 +1,15 @@
 #!/bin/bash
-#######################################################################################
+####################################################################################
 # By Eran Kuris and Noam Manos, 2018 ###############################################
-#######################################################################################
+####################################################################################
 
 # CONSTANTS
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NO_CLR='\033[0m' # No Color
+KEY_FILE=tester_key.pem
+KEYGEN_FIP='ssh-keygen -f ~/.ssh/known_hosts -R $fip'
+TEST_SSH_FIP='COUNT=0; until ssh -i $KEY_FILE -o StrictHostKeyChecking=no $ssh_user@$fip uptime || [ $COUNT -eq 10 ]; do sleep 5; echo $(( COUNT++ )); done'
 
 shopt -s nocasematch # No case sensitive match for cli options
 
@@ -46,6 +49,9 @@ do
     -q|--quit)
       quit_on_error=True
       shift ;;
+    -h|--help)
+      show_help=True
+      shift ;;
     -*)
       echo "$0: Error - unrecognized option $1" 1>&2; exit 1 ;;
     *)
@@ -71,17 +77,21 @@ Running with pre-defined parameters (optional):
 * To set the number of VMs:                             -v / --machines [ 1-100 ]
 * To create external network:                           -e / --external [ flat / vlan / skip ]
 * To run environment cleanup initially:                 -c / --cleanup  [ NO / YES ]
+* To show this help menu:                               -h / --help
 
 Command example:
 ./create_multi_topology.sh -d -q -t mvi -i cirros35 -n 2 -v 1 -e flat -c YES
 
 ----------------------------------------------------------------------"
 
+# Show script options
+[[ -z "$show_help" ]] || exit 0
+
 # Script will stop executing on first error, if requested
 [[ -z "$quit_on_error" ]] || set -e
 
 # Running commands inside Undercloud as Overcloud admin user
-if [ "$USER" != "stack" ];then
+if [ "$USER" != "stack" ]; then
     echo "Must be logged in as stack user. Exiting."
     exit 1
 fi
@@ -238,7 +248,7 @@ if  [[ $cleanup_needed = YES ]];  then
   for secgroup in $(openstack security group list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug security group delete $secgroup; done
 
   echo -e "\n* Deleting Tenant test project and user"
-  rm -rf tester_key.pem
+  rm -rf $KEY_FILE
   openstack project list | grep test_cloud && openstack $debug project delete test_cloud || echo No project test_cloud
   openstack user list | grep tester && openstack $debug user delete tester || echo No user tester
   #rm -rf tester_rc
@@ -267,7 +277,7 @@ fi
 if [[ $image = cirros35 ]]; then
   # cirros image
   echo -e "\n* Creating CirrOS 0.3.5 Image:"
-  wget -N https://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img --no-check-certificate
+  wget -nc https://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img --no-check-certificate
   openstack $debug image create --container-format bare --disk-format qcow2 --public --file cirros-0.3.5-x86_64-disk.img cirros35
 
   # cirros flavor
@@ -280,16 +290,16 @@ else
   if [[ $image = rhel74 ]]; then
     # rhel v7.4 image
     echo -e "\n* Creating RHEL v7.4 Image:"
-    wget -N http://file.tlv.redhat.com/~ekuris/custom_ci_image/rhel-guest-image-7.4-191.x86_64.qcow2
-    openstack $debug image create --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.4-191.x86_64.qcow2 rhel74
+    wget -nc http://file.tlv.redhat.com/~ekuris/custom_ci_image/rhel-guest-image-7.4-191.x86_64.qcow2
+    openstack image show $image || openstack $debug image create --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.4-191.x86_64.qcow2 rhel74
   else
     if [[ $image = rhel75 ]]; then
       # rhel v7.5 image
       echo -e "\n* Creating RHEL v7.5 Image:"
       #wget -N http://file.tlv.redhat.com/~ekuris/custom_ci_image/rhel-guest-image-7.5-137.x86_64.qcow2
       #openstack image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.5-137.x86_64.qcow2
-      wget -N http://file.tlv.redhat.com/~nmanos/rhel-guest-image-7.5-146_apache_php.qcow2
-      openstack $debug image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.5-146_apache_php.qcow2
+      wget -nc http://file.tlv.redhat.com/~nmanos/rhel-guest-image-7.5-146_apache_php.qcow2
+      openstack image show $image || openstack $debug image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.5-146_apache_php.qcow2
     fi
   fi
 
@@ -339,7 +349,9 @@ export PYTHONWARNINGS="ignore:Certificate has no, ignore:A true SSLContext objec
 
 # Add OS_CLOUDNAME to PS1
 if [ -z "\${CLOUDPROMPT_ENABLED:-}" ]; then
-    export PS1=\${PS1:-""}
+    hat="🎩"
+    export PS1="\[\e[31m\]$hat\[\e[0m\]"
+    #export PS1=\${PS1:-""}
     export PS1=\\\${OS_CLOUDNAME:+"(\\\$OS_CLOUDNAME)"}\ \$PS1
     export CLOUDPROMPT_ENABLED=1
 fi
@@ -365,7 +377,7 @@ router_id=$(openstack router list | grep -m 1 Router_eNet | cut -d " " -f 2)
 
 # Create networks and sub-networks
 for i in `seq 1 $net_num`; do
-  #create sub network with IPv4 & IPv6
+  # Create sub network with IPv4 & IPv6
   echo -e "\n* Creating Network net_ipv64_$i:"
   openstack $debug network create net_ipv64_$i
   echo -e "\n* Creating ipv4 Subnet on net_ipv64_$i - subnet_ipv4_$i:"
@@ -373,14 +385,14 @@ for i in `seq 1 $net_num`; do
   echo -e "\n* Creating ipv6 Subnet on net_ipv64_$i - subnet_ipv6_$i:"
   openstack $debug subnet create --subnet-range 200$i::/64 --network net_ipv64_$i  --ipv6-address-mode slaac  --ipv6-ra-mode slaac --ip-version 6 subnet_ipv6_$i
 
-  #add the subnet to the router
+  # Add the subnet to the router
   echo -e "\n* Adding subnet_ipv4_$i and subnet_ipv6_$i to the router."
   openstack $debug router add subnet $router_id subnet_ipv4_$i
   openstack $debug router add subnet $router_id subnet_ipv6_$i
 done
 
 
-#create external gateway
+# Create external gateway
 echo -e "\n* Connecting the router to the external network \"$ext_net\""
 if [[ $osp_version > 10 ]]; then
   openstack $debug router set --external-gateway $ext_net $router_id
@@ -388,11 +400,11 @@ else
   neutron $debug router-gateway-set $router_id $ext_net
 fi
 
-#create security group
+# Create security group
 echo -e "\n* Creating security group rules for group \"sec_group\""
 sec_id=$(openstack security group create sec_group | awk -F'[ \t]*\\|[ \t]*' '/ id / {print $3}')
 
-#create security group rules
+# Create security group rules
 openstack $debug security group rule create $sec_id --protocol tcp --dst-port 80 --remote-ip 0.0.0.0/0
 openstack $debug security group rule create $sec_id --protocol tcp --dst-port 22 --remote-ip 0.0.0.0/0
 openstack $debug security group rule create $sec_id --protocol tcp --dst-port 443 --remote-ip 0.0.0.0/0
@@ -407,16 +419,16 @@ openstack $debug security group rule create $sec_id --protocol icmp --dst-port -
 
 openstack security group rule list
 
-#Create RSA private-key:
+# Create RSA private-key:
 echo -e "\n* Creating openstack key pair to easily login into VMs:"
-#openstack keypair create tester-key --private-key tester_key.pem
-openstack keypair list | grep tester-key || openstack $debug keypair create tester-key --private-key tester_key.pem
-chmod 400 tester_key.pem
+#openstack keypair create tester-key --private-key $KEY_FILE
+openstack keypair list | grep tester-key || openstack $debug keypair create tester-key --private-key $KEY_FILE
+chmod 400 $KEY_FILE
 openstack keypair list
 
-###### Seting Networks and VMs topology
+###### Seting Networks and VMs topology ######
 
-#create for each VM - multiple NICs (mni)
+# Create for each VM - multiple NICs (mni)
 if  [[ $topology = mni ]];  then
   #Create VM instanses:"
   echo -e "\n* Creating $inst_num VM instanses."
@@ -444,7 +456,7 @@ if  [[ $topology = mni ]];  then
      ipv4s=$(openstack server show $vm_id -c addresses -f value | sed -r "s/\w+:+//g" | sed -r "s/\w{4}(,|;)//g")
      echo -e "\n* Configuring Networks for each of the $net_num NICs: $ipv4s"
 
-     # loop over addresses of each NIC inside VM (net_ipv64_1, net_ipv64_2, etc.)
+     # Loop over addresses of each NIC inside VM (net_ipv64_1, net_ipv64_2, etc.)
      # And create multiple floating ips in VM (FIP for each NIC)
      for n in `seq 1 $net_num`; do
 
@@ -476,21 +488,23 @@ if  [[ $topology = mni ]];  then
 
        # until ping -c1 $fip ; do sleep 1 ; done
        ping -w 30 -c 5 ${fip:-NO_FIP}
-       curl $fip:80
-       #curl $fip:443
+       curl $fip:80 || true
+       #curl $fip:443 || true
 
        echo -e "\n* Generate ssh key to access ${vm_name} on ${fip}, and checking ssh uptime:"
-       ssh-keygen -f ~/.ssh/known_hosts -R $fip
-       ssh -i tester_key.pem -o "StrictHostKeyChecking no" ${ssh_user}@${fip} uptime
+       echo "$KEYGEN_FIP"
+       eval "$KEYGEN_FIP"
+       echo "$TEST_SSH_FIP"
+       eval "$TEST_SSH_FIP"
      done
   done
 fi
 
-#create for each Network - multiple VM instances (mvi)
+# Create for each Network - multiple VM instances (mvi)
 if  [[ $topology = mvi ]];  then
   echo -e "\n* For each Network - creating $inst_num VM instances:"
   for n in `seq 1 $net_num`; do
-    #Create VM instanses:"
+    # Create VM instanses:
     for i in `seq 1 $inst_num`; do
       #create one floating ip for each VM instance
       fip=$(openstack floating ip create $ext_net -c floating_ip_address -f value)
@@ -530,12 +544,14 @@ if  [[ $topology = mvi ]];  then
 
       # until ping -c1 $fip ; do sleep 1 ; done
       ping -w 30 -c 5 ${fip:-NO_FIP}
-      curl $fip:80
-      #curl $fip:443
+      curl $fip:80 || true
+      #curl $fip:443 || true
 
       echo -e "\n* Generate ssh key to access $vm_name on $fip, and checking ssh uptime:"
-      ssh-keygen -f ~/.ssh/known_hosts -R $fip
-      ssh -i tester_key.pem -o "StrictHostKeyChecking no" ${ssh_user}@${fip} uptime
+      echo "$KEYGEN_FIP"
+      eval "$KEYGEN_FIP"
+      echo "$TEST_SSH_FIP"
+      eval "$TEST_SSH_FIP"
     done
   done
 fi
@@ -549,7 +565,10 @@ Creating and testing multiple VMs and Networks completed. Please verify output c
 "
 
 echo "To SSH into VM:
-ssh -i tester_key.pem ${ssh_user}@SERVER_FIP"
+ssh -i $KEY_FILE ${ssh_user}@SERVER_FIP"
 
 #echo "root password to rhel images is: 12345678"
 #echo "password for cirros is cubswin:)"
+#
+# To override script content: > create_multi_topology.sh; chmod +x create_multi_topology.sh; vi create_multi_topology.sh
+# Execution example: ./create_multi_topology.sh -q -i rhel75 -t mvi -c YES -e skip -n 2 -v 1
