@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 openstack overcloud deploy  \
 --templates \
 --timeout 120 \
