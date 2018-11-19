@@ -195,8 +195,6 @@
     - InternalApi
     - Tenant
     - Storage
-  RoleParametersDefault:
-    TunedProfileName: "cpu-partitioning"
   ServicesDefault:
     - OS::TripleO::Services::Aide
     - OS::TripleO::Services::AuditD
