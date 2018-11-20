@@ -7,6 +7,6 @@ openstack overcloud deploy  \
 -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/services/neutron-sriov.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
--e /home/stack/containers-prepare-parameter.yaml \
 -e /home/stack/ospd-14-vlan-multiple-nic-sriov-hybrid-ha/network-environment.yaml \
+-e /home/stack/containers-prepare-parameter.yaml \
 --log-file overcloud_install.log &> overcloud_install.log
