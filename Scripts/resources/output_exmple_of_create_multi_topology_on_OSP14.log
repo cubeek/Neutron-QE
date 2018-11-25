@@ -1,0 +1,1099 @@
+[stack@undercloud-0 ~]$
+[stack@undercloud-0 ~]$ ./create_multi_topology.sh -q -i rhel75 -t mvi -c YES -e skip -n 2 -v 2
+VM image to use: rhel75
+Topology to create: Multiple VMs per network
+Run environment cleanup initially: YES
+External network type to create: skip
+Number of Networks to create: 2
+Number of VMs to create: 2
+----------------------------------------------------------------------
+This script will create and run:
+
+* Multiple VM instances (of type RHEL 7.5 / RHEL 7.4 / Cirros)
+* Multiple Networks with IPv4 & Ipv6 subnets, and Floating IPs, connected to external router.
+* SSH Keypair and connectivity test.
+
+Running with pre-defined parameters (optional):
+
+* To debug (verbose output):                            -d / --debug
+* To quit on first error:                               -q / --quit
+* To set VM image:                                      -i / --image    [ rhel74 / rhel75 / cirros35 ]
+* To set topology - Multiple VMs or multiple NICs:      -t / --topology [ mni = Multiple Networks Intrfaces / mvi = Multiple VM Instances ]
+* To set the number of networks:                        -n / --networks [ 1-100 ]
+* To set the number of VMs:                             -v / --machines [ 1-100 ]
+* To create external network:                           -e / --external [ flat / vlan / skip ]
+* To run environment cleanup initially:                 -c / --cleanup  [ NO / YES ]
+* To show this help menu:                               -h / --help
+
+Command example:
+./create_multi_topology.sh -d -q -t mvi -i cirros35 -n 2 -v 1 -e flat -c YES
+
+----------------------------------------------------------------------
+
+Base OSP version: 14   -p 2018-10-17.2
+
+Currently deployed puddle:
+# puddle_baseurl=http://rhos-qe-mirror-tlv.usersys.redhat.com/rcm-guest/puddles/OpenStack/14.0-RHEL-7/2018-10-17.2/RH7-RHOS-14.0/$basearch/os
+
+External network exists: public
+
+* Deleting all VM instances
+.........
+* Removing all subnets from router (ID: 215ff600-9618-419f-aa4d-e7fd137f4a75)
+.......
+* Deleting all floating ips
+.........
+* Unsetting external gateway from all routers
+.
+* Deleting all trunks
+
+* Deleting all ports
+.........
+* Deleting all subnets
+......
+* Deleting all routers
+.
+* Deleting all internal networks
+...
+* Deleting all VM images
+.
+* Deleting all VM flavors
+.
+* Deleting all security groups
+.....
+* Deleting Tenant test project and user
+| 2e464d9b7f2d40798efcb4925e879c42 | test_cloud |
+| 9167840c5e2542f09eba6b50e6014856 | tester                  |
+
+* Creating RHEL v7.5 Image:
+File ‘rhel-guest-image-7.5-146_apache_php.qcow2’ already there; not retrieving.
+
+Could not find resource rhel75
++------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Field            | Value                                                                                                                                                                                                                                                                    |
++------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| checksum         | 235b5957fd94dae9073eded5549bbd16                                                                                                                                                                                                                                         |
+| container_format | bare                                                                                                                                                                                                                                                                     |
+| created_at       | 2018-10-29T08:19:33Z                                                                                                                                                                                                                                                     |
+| disk_format      | qcow2                                                                                                                                                                                                                                                                    |
+| file             | /v2/images/b52190e5-a03f-441b-aaf4-2d12966da10c/file                                                                                                                                                                                                                     |
+| id               | b52190e5-a03f-441b-aaf4-2d12966da10c                                                                                                                                                                                                                                     |
+| min_disk         | 0                                                                                                                                                                                                                                                                        |
+| min_ram          | 0                                                                                                                                                                                                                                                                        |
+| name             | rhel75                                                                                                                                                                                                                                                                   |
+| owner            | de52ff92b2854e01828acf7353ee49a3                                                                                                                                                                                                                                         |
+| properties       | direct_url='swift+config://ref1/glance/b52190e5-a03f-441b-aaf4-2d12966da10c', os_hash_algo='sha512', os_hash_value='b6f0f172cf8f0032b50ebb0ff8ea1a98acc1c8f7fef26e085e76a0654cbff0a75b2592b68d36334cd62846b3d3854afba80cb71b98b7a8e0f98df8133b456ca7', os_hidden='False' |
+| protected        | False                                                                                                                                                                                                                                                                    |
+| schema           | /v2/schemas/image                                                                                                                                                                                                                                                        |
+| size             | 1328873472                                                                                                                                                                                                                                                               |
+| status           | active                                                                                                                                                                                                                                                                   |
+| tags             |                                                                                                                                                                                                                                                                          |
+| updated_at       | 2018-10-29T08:19:54Z                                                                                                                                                                                                                                                     |
+| virtual_size     | None                                                                                                                                                                                                                                                                     |
+| visibility       | public                                                                                                                                                                                                                                                                   |
++------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+* Creating RHEL Flavor:
+No flavor with a name or ID of 'rhel_flavor' exists.
++----------------------------+--------------------------------------+
+| Field                      | Value                                |
++----------------------------+--------------------------------------+
+| OS-FLV-DISABLED:disabled   | False                                |
+| OS-FLV-EXT-DATA:ephemeral  | 0                                    |
+| disk                       | 10                                   |
+| id                         | 1aedd8c3-2d1d-4a83-b6a1-c9fadb164763 |
+| name                       | rhel_flavor                          |
+| os-flavor-access:is_public | True                                 |
+| properties                 |                                      |
+| ram                        | 1024                                 |
+| rxtx_factor                | 1.0                                  |
+| swap                       |                                      |
+| vcpus                      | 1                                    |
++----------------------------+--------------------------------------+
+
+* Create Tenant user "tester" - privilaged user (non-admin):
++-------------+----------------------------------+
+| Field       | Value                            |
++-------------+----------------------------------+
+| description |                                  |
+| domain_id   | default                          |
+| enabled     | True                             |
+| id          | 49c6c937056f4bb99084f33321c4e5a4 |
+| is_domain   | False                            |
+| name        | test_cloud                       |
+| parent_id   | default                          |
+| tags        | []                               |
++-------------+----------------------------------+
++---------------------+----------------------------------+
+| Field               | Value                            |
++---------------------+----------------------------------+
+| default_project_id  | 49c6c937056f4bb99084f33321c4e5a4 |
+| domain_id           | default                          |
+| enabled             | True                             |
+| id                  | 57779ed323df4fbf818879bda5f7952c |
+| name                | tester                           |
+| options             | {}                               |
+| password_expires_at | None                             |
++---------------------+----------------------------------+
++----------------------------------+-------------------------+
+| ID                               | Name                    |
++----------------------------------+-------------------------+
+| 05eea76375864c38b0de2f021f77df74 | admin                   |
+| 0cb617a3fc1b4bcf979645e4518696de | glance                  |
+| 2278b95fb84f412282b21f564e1e8b22 | heat                    |
+| 297a48b9387a4929a95bc5d913b86e7c | heat_stack_domain_admin |
+| 3650109e45854c6da44f881eda4d0ab3 | aodh                    |
+| 36cab488c8854c22aeb6cac0da98e007 | panko                   |
+| 3c4c3b4ad3c2460faf0f1a58f1753e38 | placement               |
+| 55b61c16fbce42b1ab6065e0bfdcf775 | cinder                  |
+| 57779ed323df4fbf818879bda5f7952c | tester                  |
+| 7ed270e657484c3d803a1c2fee85d456 | gnocchi                 |
+| 83bdcf0fe55149839ca742c27207b606 | heat-cfn                |
+| 983664e5a7374fb188ce136864fd7109 | nova                    |
+| 9d694b2dcae3467db44df372207aed7d | alt_demo                |
+| ba76de537c2048758878075746516544 | swift                   |
+| c807789b00e541a491180b1f8cfaa609 | ceilometer              |
+| e8c9e0794a3b43878e41f8a32b22d925 | neutron                 |
+| ef95c4413941462cba391e5cc31f423e | demo                    |
++----------------------------------+-------------------------+
++----------------------------------+------------------+
+| ID                               | Name             |
++----------------------------------+------------------+
+| 09ad896e34834144a6d9bec8c7dfd05d | member           |
+| 10de18a1abb349b8a09f6387e1d4a7b4 | heat_stack_owner |
+| 4273ea7a05314b019edb2e1f3d62ac16 | reader           |
+| 61977d0d364a4e07b8b3d0c64f132d08 | swiftoperator    |
+| 7e54418fb9284995acff70ad3cf294ea | ResellerAdmin    |
+| 8e6caa30162e4767a544dc089bc430f7 | admin            |
+| 9fe2ff9ee4384b1894a90878d3e92bab | _member_         |
+| ab98b3ac7eaa478d8e8b59823d586bc7 | heat_stack_user  |
++----------------------------------+------------------+
+
+* Create a "tester_rc" file, similar to "overcloudrc", but with tester limited access:
+echo -e \n* Keystone Public IP: 10.0.0.102
+echo -e \n* Keystone Admin IP: 192.168.24.6
+5,6c5,6
+< export OS_USERNAME=tester
+< export no_proxy=,10.0.0.102,10.0.0.102
+---
+> export OS_USERNAME=admin
+> export no_proxy=,10.0.0.102,192.168.24.6
+9,10c9,10
+< export OS_CLOUDNAME=tester
+< export OS_AUTH_URL=http://10.0.0.102:5000//v3
+---
+> export OS_CLOUDNAME=overcloud
+> export OS_AUTH_URL=http://10.0.0.102:5000/v3
+13c13
+< export OS_PASSWORD=testerpass
+---
+> export OS_PASSWORD=Hq2FJekSn0TCwBGP7bOdokLtd
+16c16
+< export OS_PROJECT_NAME=test_cloud
+---
+> export OS_PROJECT_NAME=admin
+22,24c22
+<     hat="🎩"
+<     export PS1="\[\e[31m\]\[\e[0m\]"
+<     #export PS1=${PS1:-""}
+---
+>     export PS1=${PS1:-""}
+27,32d24
+< fi
+<
+< # Add Timestamp to PS1
+< if [ -z "${TIMESTAMP_ENABLED:-}" ]; then
+<     export PS1="[\$(date +%T.%3N)] $PS1"
+<     export TIMESTAMP_ENABLED=1
+
+* New env. file "tester_rc" was created.
+
+* Sourcing "tester_rc" environment to run actions as tenant "tester" (privalaged user):
+
+* Creating Router and 2 Networks - each one with both IPv4 and IPv6 Subnets:
++-------------------------+--------------------------------------+
+| Field                   | Value                                |
++-------------------------+--------------------------------------+
+| admin_state_up          | UP                                   |
+| availability_zone_hints | None                                 |
+| availability_zones      | None                                 |
+| created_at              | 2018-10-29T08:20:38Z                 |
+| description             |                                      |
+| distributed             | None                                 |
+| external_gateway_info   | None                                 |
+| flavor_id               | None                                 |
+| ha                      | None                                 |
+| id                      | 5425d7c8-ed6f-475a-9903-2d79cef3015e |
+| name                    | Router_eNet                          |
+| project_id              | 49c6c937056f4bb99084f33321c4e5a4     |
+| revision_number         | 0                                    |
+| routes                  |                                      |
+| status                  | ACTIVE                               |
+| tags                    |                                      |
+| updated_at              | 2018-10-29T08:20:38Z                 |
++-------------------------+--------------------------------------+
+
+* Creating Network net_ipv64_1:
++---------------------------+--------------------------------------+
+| Field                     | Value                                |
++---------------------------+--------------------------------------+
+| admin_state_up            | UP                                   |
+| availability_zone_hints   |                                      |
+| availability_zones        |                                      |
+| created_at                | 2018-10-29T08:20:46Z                 |
+| description               |                                      |
+| dns_domain                | None                                 |
+| id                        | 9d8658e6-2c12-4163-9789-532007fd7c20 |
+| ipv4_address_scope        | None                                 |
+| ipv6_address_scope        | None                                 |
+| is_default                | False                                |
+| is_vlan_transparent       | None                                 |
+| mtu                       | 1450                                 |
+| name                      | net_ipv64_1                          |
+| port_security_enabled     | True                                 |
+| project_id                | 49c6c937056f4bb99084f33321c4e5a4     |
+| provider:network_type     | None                                 |
+| provider:physical_network | None                                 |
+| provider:segmentation_id  | None                                 |
+| qos_policy_id             | None                                 |
+| revision_number           | 1                                    |
+| router:external           | Internal                             |
+| segments                  | None                                 |
+| shared                    | False                                |
+| status                    | ACTIVE                               |
+| subnets                   |                                      |
+| tags                      |                                      |
+| updated_at                | 2018-10-29T08:20:46Z                 |
++---------------------------+--------------------------------------+
+
+* Creating ipv4 Subnet on net_ipv64_1 - subnet_ipv4_1:
++-------------------+--------------------------------------+
+| Field             | Value                                |
++-------------------+--------------------------------------+
+| allocation_pools  | 10.0.1.2-10.0.1.254                  |
+| cidr              | 10.0.1.0/24                          |
+| created_at        | 2018-10-29T08:20:52Z                 |
+| description       |                                      |
+| dns_nameservers   |                                      |
+| enable_dhcp       | True                                 |
+| gateway_ip        | 10.0.1.1                             |
+| host_routes       |                                      |
+| id                | 85cc205c-9a12-4f75-8352-e40f040210f2 |
+| ip_version        | 4                                    |
+| ipv6_address_mode | None                                 |
+| ipv6_ra_mode      | None                                 |
+| name              | subnet_ipv4_1                        |
+| network_id        | 9d8658e6-2c12-4163-9789-532007fd7c20 |
+| project_id        | 49c6c937056f4bb99084f33321c4e5a4     |
+| revision_number   | 0                                    |
+| segment_id        | None                                 |
+| service_types     |                                      |
+| subnetpool_id     | None                                 |
+| tags              |                                      |
+| updated_at        | 2018-10-29T08:20:52Z                 |
++-------------------+--------------------------------------+
+
+* Creating ipv6 Subnet on net_ipv64_1 - subnet_ipv6_1:
++-------------------+--------------------------------------+
+| Field             | Value                                |
++-------------------+--------------------------------------+
+| allocation_pools  | 2001::2-2001::ffff:ffff:ffff:ffff    |
+| cidr              | 2001::/64                            |
+| created_at        | 2018-10-29T08:21:00Z                 |
+| description       |                                      |
+| dns_nameservers   |                                      |
+| enable_dhcp       | True                                 |
+| gateway_ip        | 2001::1                              |
+| host_routes       |                                      |
+| id                | 7d71ab03-363a-434f-8d0e-beeeba93da72 |
+| ip_version        | 6                                    |
+| ipv6_address_mode | slaac                                |
+| ipv6_ra_mode      | slaac                                |
+| name              | subnet_ipv6_1                        |
+| network_id        | 9d8658e6-2c12-4163-9789-532007fd7c20 |
+| project_id        | 49c6c937056f4bb99084f33321c4e5a4     |
+| revision_number   | 0                                    |
+| segment_id        | None                                 |
+| service_types     |                                      |
+| subnetpool_id     | None                                 |
+| tags              |                                      |
+| updated_at        | 2018-10-29T08:21:00Z                 |
++-------------------+--------------------------------------+
+
+* Adding subnet_ipv4_1 and subnet_ipv6_1 to the router.
+
+* Creating Network net_ipv64_2:
++---------------------------+--------------------------------------+
+| Field                     | Value                                |
++---------------------------+--------------------------------------+
+| admin_state_up            | UP                                   |
+| availability_zone_hints   |                                      |
+| availability_zones        |                                      |
+| created_at                | 2018-10-29T08:21:31Z                 |
+| description               |                                      |
+| dns_domain                | None                                 |
+| id                        | fe184d9e-f02c-447f-bc9b-53403476cbee |
+| ipv4_address_scope        | None                                 |
+| ipv6_address_scope        | None                                 |
+| is_default                | False                                |
+| is_vlan_transparent       | None                                 |
+| mtu                       | 1450                                 |
+| name                      | net_ipv64_2                          |
+| port_security_enabled     | True                                 |
+| project_id                | 49c6c937056f4bb99084f33321c4e5a4     |
+| provider:network_type     | None                                 |
+| provider:physical_network | None                                 |
+| provider:segmentation_id  | None                                 |
+| qos_policy_id             | None                                 |
+| revision_number           | 1                                    |
+| router:external           | Internal                             |
+| segments                  | None                                 |
+| shared                    | False                                |
+| status                    | ACTIVE                               |
+| subnets                   |                                      |
+| tags                      |                                      |
+| updated_at                | 2018-10-29T08:21:31Z                 |
++---------------------------+--------------------------------------+
+
+* Creating ipv4 Subnet on net_ipv64_2 - subnet_ipv4_2:
++-------------------+--------------------------------------+
+| Field             | Value                                |
++-------------------+--------------------------------------+
+| allocation_pools  | 10.0.2.2-10.0.2.254                  |
+| cidr              | 10.0.2.0/24                          |
+| created_at        | 2018-10-29T08:21:38Z                 |
+| description       |                                      |
+| dns_nameservers   |                                      |
+| enable_dhcp       | True                                 |
+| gateway_ip        | 10.0.2.1                             |
+| host_routes       |                                      |
+| id                | d00b725c-6ffc-4a20-83f1-84fd3993f220 |
+| ip_version        | 4                                    |
+| ipv6_address_mode | None                                 |
+| ipv6_ra_mode      | None                                 |
+| name              | subnet_ipv4_2                        |
+| network_id        | fe184d9e-f02c-447f-bc9b-53403476cbee |
+| project_id        | 49c6c937056f4bb99084f33321c4e5a4     |
+| revision_number   | 0                                    |
+| segment_id        | None                                 |
+| service_types     |                                      |
+| subnetpool_id     | None                                 |
+| tags              |                                      |
+| updated_at        | 2018-10-29T08:21:38Z                 |
++-------------------+--------------------------------------+
+
+* Creating ipv6 Subnet on net_ipv64_2 - subnet_ipv6_2:
++-------------------+--------------------------------------+
+| Field             | Value                                |
++-------------------+--------------------------------------+
+| allocation_pools  | 2002::2-2002::ffff:ffff:ffff:ffff    |
+| cidr              | 2002::/64                            |
+| created_at        | 2018-10-29T08:21:47Z                 |
+| description       |                                      |
+| dns_nameservers   |                                      |
+| enable_dhcp       | True                                 |
+| gateway_ip        | 2002::1                              |
+| host_routes       |                                      |
+| id                | 962a514e-9890-41e1-954b-0f8ab463a732 |
+| ip_version        | 6                                    |
+| ipv6_address_mode | slaac                                |
+| ipv6_ra_mode      | slaac                                |
+| name              | subnet_ipv6_2                        |
+| network_id        | fe184d9e-f02c-447f-bc9b-53403476cbee |
+| project_id        | 49c6c937056f4bb99084f33321c4e5a4     |
+| revision_number   | 0                                    |
+| segment_id        | None                                 |
+| service_types     |                                      |
+| subnetpool_id     | None                                 |
+| tags              |                                      |
+| updated_at        | 2018-10-29T08:21:47Z                 |
++-------------------+--------------------------------------+
+
+* Adding subnet_ipv4_2 and subnet_ipv6_2 to the router.
+
+* Connecting the router to the external network "public"
+
+* Creating security group rules for group "sec_group"
++-------------------+--------------------------------------+
+| Field             | Value                                |
++-------------------+--------------------------------------+
+| created_at        | 2018-10-29T08:22:32Z                 |
+| description       |                                      |
+| direction         | ingress                              |
+| ether_type        | IPv4                                 |
+| id                | 7a1c1187-b1c9-4b3d-814e-b3ec95871578 |
+| name              | None                                 |
+| port_range_max    | 80                                   |
+| port_range_min    | 80                                   |
+| project_id        | 49c6c937056f4bb99084f33321c4e5a4     |
+| protocol          | tcp                                  |
+| remote_group_id   | None                                 |
+| remote_ip_prefix  | 0.0.0.0/0                            |
+| revision_number   | 0                                    |
+| security_group_id | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| updated_at        | 2018-10-29T08:22:32Z                 |
++-------------------+--------------------------------------+
++-------------------+--------------------------------------+
+| Field             | Value                                |
++-------------------+--------------------------------------+
+| created_at        | 2018-10-29T08:22:37Z                 |
+| description       |                                      |
+| direction         | ingress                              |
+| ether_type        | IPv4                                 |
+| id                | bd26763e-2345-4236-a432-959503787f53 |
+| name              | None                                 |
+| port_range_max    | 22                                   |
+| port_range_min    | 22                                   |
+| project_id        | 49c6c937056f4bb99084f33321c4e5a4     |
+| protocol          | tcp                                  |
+| remote_group_id   | None                                 |
+| remote_ip_prefix  | 0.0.0.0/0                            |
+| revision_number   | 0                                    |
+| security_group_id | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| updated_at        | 2018-10-29T08:22:37Z                 |
++-------------------+--------------------------------------+
++-------------------+--------------------------------------+
+| Field             | Value                                |
++-------------------+--------------------------------------+
+| created_at        | 2018-10-29T08:22:42Z                 |
+| description       |                                      |
+| direction         | ingress                              |
+| ether_type        | IPv4                                 |
+| id                | 45080a24-00cc-456b-a55b-bfa0c320ab1b |
+| name              | None                                 |
+| port_range_max    | 443                                  |
+| port_range_min    | 443                                  |
+| project_id        | 49c6c937056f4bb99084f33321c4e5a4     |
+| protocol          | tcp                                  |
+| remote_group_id   | None                                 |
+| remote_ip_prefix  | 0.0.0.0/0                            |
+| revision_number   | 0                                    |
+| security_group_id | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| updated_at        | 2018-10-29T08:22:42Z                 |
++-------------------+--------------------------------------+
++-------------------+--------------------------------------+
+| Field             | Value                                |
++-------------------+--------------------------------------+
+| created_at        | 2018-10-29T08:22:46Z                 |
+| description       |                                      |
+| direction         | ingress                              |
+| ether_type        | IPv4                                 |
+| id                | 37e36d63-6276-4f63-9422-32866f234994 |
+| name              | None                                 |
+| port_range_max    | None                                 |
+| port_range_min    | None                                 |
+| project_id        | 49c6c937056f4bb99084f33321c4e5a4     |
+| protocol          | icmp                                 |
+| remote_group_id   | None                                 |
+| remote_ip_prefix  | 0.0.0.0/0                            |
+| revision_number   | 0                                    |
+| security_group_id | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| updated_at        | 2018-10-29T08:22:46Z                 |
++-------------------+--------------------------------------+
++--------------------------------------+-------------+-----------+------------+--------------------------------------+--------------------------------------+
+| ID                                   | IP Protocol | IP Range  | Port Range | Remote Security Group                | Security Group                       |
++--------------------------------------+-------------+-----------+------------+--------------------------------------+--------------------------------------+
+| 16b21f0f-a18c-4787-a60d-477b4c1be0bc | None        | None      |            | None                                 | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| 2980dae5-f982-47cb-a565-6b12fa953c99 | None        | None      |            | None                                 | 6c203641-fe0a-47b7-9d6e-11f088848ce7 |
+| 37e36d63-6276-4f63-9422-32866f234994 | icmp        | 0.0.0.0/0 |            | None                                 | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| 45080a24-00cc-456b-a55b-bfa0c320ab1b | tcp         | 0.0.0.0/0 | 443:443    | None                                 | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| 55c28918-59a4-4a15-9a02-6a082035eeea | None        | None      |            | None                                 | 6c203641-fe0a-47b7-9d6e-11f088848ce7 |
+| 7a1c1187-b1c9-4b3d-814e-b3ec95871578 | tcp         | 0.0.0.0/0 | 80:80      | None                                 | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| bd26763e-2345-4236-a432-959503787f53 | tcp         | 0.0.0.0/0 | 22:22      | None                                 | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| d7789381-101f-4ea6-a171-1eaead0d2c99 | None        | None      |            | None                                 | 65773414-4929-4fcb-b39b-a877a5d7399e |
+| e5e4f4b8-3249-4651-ae84-005e9e1ff3ef | None        | None      |            | 6c203641-fe0a-47b7-9d6e-11f088848ce7 | 6c203641-fe0a-47b7-9d6e-11f088848ce7 |
+| f9001014-ee6c-4b15-8393-a59055e73f61 | None        | None      |            | 6c203641-fe0a-47b7-9d6e-11f088848ce7 | 6c203641-fe0a-47b7-9d6e-11f088848ce7 |
++--------------------------------------+-------------+-----------+------------+--------------------------------------+--------------------------------------+
+
+* Creating openstack key pair to easily login into VMs:
++-------------+-------------------------------------------------+
+| Field       | Value                                           |
++-------------+-------------------------------------------------+
+| fingerprint | 45:55:fe:9f:49:5c:3c:41:e5:a8:0b:7d:ec:db:b7:68 |
+| name        | tester-key                                      |
+| user_id     | 57779ed323df4fbf818879bda5f7952c                |
++-------------+-------------------------------------------------+
++------------+-------------------------------------------------+
+| Name       | Fingerprint                                     |
++------------+-------------------------------------------------+
+| tester-key | 45:55:fe:9f:49:5c:3c:41:e5:a8:0b:7d:ec:db:b7:68 |
++------------+-------------------------------------------------+
+
+* For each Network - creating 2 VM instances:
+
+* Creating and booting VM instance: rhel75_vm1_net1, connected to network net_ipv64_1:
++-----------------------------+----------------------------------------------------+
+| Field                       | Value                                              |
++-----------------------------+----------------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                             |
+| OS-EXT-AZ:availability_zone |                                                    |
+| OS-EXT-STS:power_state      | NOSTATE                                            |
+| OS-EXT-STS:task_state       | scheduling                                         |
+| OS-EXT-STS:vm_state         | building                                           |
+| OS-SRV-USG:launched_at      | None                                               |
+| OS-SRV-USG:terminated_at    | None                                               |
+| accessIPv4                  |                                                    |
+| accessIPv6                  |                                                    |
+| addresses                   |                                                    |
+| adminPass                   | UBxVgKoZa38P                                       |
+| config_drive                |                                                    |
+| created                     | 2018-10-29T08:23:38Z                               |
+| flavor                      | rhel_flavor (1aedd8c3-2d1d-4a83-b6a1-c9fadb164763) |
+| hostId                      |                                                    |
+| id                          | 5be427f2-5cc6-4614-9345-d36d72bc9265               |
+| image                       | rhel75 (b52190e5-a03f-441b-aaf4-2d12966da10c)      |
+| key_name                    | tester-key                                         |
+| name                        | rhel75_vm1_net1                                    |
+| progress                    | 0                                                  |
+| project_id                  | 49c6c937056f4bb99084f33321c4e5a4                   |
+| properties                  |                                                    |
+| security_groups             | name='65773414-4929-4fcb-b39b-a877a5d7399e'        |
+| status                      | BUILD                                              |
+| updated                     | 2018-10-29T08:23:38Z                               |
+| user_id                     | 57779ed323df4fbf818879bda5f7952c                   |
+| volumes_attached            |                                                    |
++-----------------------------+----------------------------------------------------+
+| name                        | rhel75_vm1_net1                                          |
+| progress                    | 0                                                        |
+| project_id                  | 49c6c937056f4bb99084f33321c4e5a4                         |
+| properties                  |                                                          |
+| security_groups             | name='sec_group'                                         |
+| status                      | ACTIVE                                                   |
+
+* Adding floating ip 10.0.0.214 to rhel75_vm1_net1, and checking connectivity:
+
+* Setting a name to the port of the new floating ip: "rhel75_vm1_net1_10.0.0.214"
++-----------------------+------------------------------------------------------------------------------------------+
+| Field                 | Value                                                                                    |
++-----------------------+------------------------------------------------------------------------------------------+
+| admin_state_up        | UP                                                                                       |
+| allowed_address_pairs |                                                                                          |
+| binding_host_id       | None                                                                                     |
+| binding_profile       | None                                                                                     |
+| binding_vif_details   | None                                                                                     |
+| binding_vif_type      | None                                                                                     |
+| binding_vnic_type     | normal                                                                                   |
+| created_at            | 2018-10-29T08:23:46Z                                                                     |
+| data_plane_status     | None                                                                                     |
+| description           |                                                                                          |
+| device_id             | 5be427f2-5cc6-4614-9345-d36d72bc9265                                                     |
+| device_owner          | compute:nova                                                                             |
+| dns_assignment        | None                                                                                     |
+| dns_domain            | None                                                                                     |
+| dns_name              | None                                                                                     |
+| extra_dhcp_opts       |                                                                                          |
+| fixed_ips             | ip_address='10.0.1.18', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                 |
+|                       | ip_address='2001::f816:3eff:fe43:df1d', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72' |
+| id                    | a0ace291-dbf5-4a2e-9af2-7adc89ec89e4                                                     |
+| mac_address           | fa:16:3e:43:df:1d                                                                        |
+| name                  | rhel75_vm1_net1_10.0.0.214                                                               |
+| network_id            | 9d8658e6-2c12-4163-9789-532007fd7c20                                                     |
+| port_security_enabled | True                                                                                     |
+| project_id            | 49c6c937056f4bb99084f33321c4e5a4                                                         |
+| qos_policy_id         | None                                                                                     |
+| revision_number       | 5                                                                                        |
+| security_group_ids    | 65773414-4929-4fcb-b39b-a877a5d7399e                                                     |
+| status                | ACTIVE                                                                                   |
+| tags                  |                                                                                          |
+| trunk_details         | None                                                                                     |
+| updated_at            | 2018-10-29T08:25:20Z                                                                     |
++-----------------------+------------------------------------------------------------------------------------------+
+
+* Waiting for Port status to be ACTIVE on rhel75_vm1_net1, with internal IP address 10.0.1.18:
+| dns_domain            | None                                                                                     |
+| dns_name              | None                                                                                     |
+| extra_dhcp_opts       |                                                                                          |
+| fixed_ips             | ip_address='10.0.1.18', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                 |
+|                       | ip_address='2001::f816:3eff:fe43:df1d', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72' |
+| id                    | a0ace291-dbf5-4a2e-9af2-7adc89ec89e4                                                     |
+| mac_address           | fa:16:3e:43:df:1d                                                                        |
+| name                  | rhel75_vm1_net1_10.0.0.214                                                               |
+| network_id            | 9d8658e6-2c12-4163-9789-532007fd7c20                                                     |
+| port_security_enabled | True                                                                                     |
+| project_id            | 49c6c937056f4bb99084f33321c4e5a4                                                         |
+| qos_policy_id         | None                                                                                     |
+| revision_number       | 5                                                                                        |
+| security_group_ids    | 65773414-4929-4fcb-b39b-a877a5d7399e                                                     |
+| status                | ACTIVE                                                                                   |
+PING 10.0.0.214 (10.0.0.214) 56(84) bytes of data.
+64 bytes from 10.0.0.214: icmp_seq=2 ttl=64 time=1.56 ms
+64 bytes from 10.0.0.214: icmp_seq=3 ttl=64 time=1.07 ms
+64 bytes from 10.0.0.214: icmp_seq=4 ttl=64 time=1.24 ms
+64 bytes from 10.0.0.214: icmp_seq=5 ttl=64 time=1.36 ms
+64 bytes from 10.0.0.214: icmp_seq=6 ttl=64 time=0.979 ms
+
+--- 10.0.0.214 ping statistics ---
+6 packets transmitted, 5 received, 16% packet loss, time 5003ms
+rtt min/avg/max/mdev = 0.979/1.245/1.565/0.210 ms
+Apache PHP Web Server:
+
+ Connected client: 10.0.0.47
+ Web server IP: 10.0.1.18
+ Web server port: 80
+
+ Host name: host-10-0-1-18
+ Operating system: Linux
+ Release name: 3.10.0-862.el7.x86_64
+ Version information: #1 SMP Wed Mar 21 18:14:51 EDT 2018
+ Machine type: x86_64
+
+
+* Generate ssh key to access rhel75_vm1_net1 on 10.0.0.214, and checking ssh uptime:
+ssh-keygen -f ~/.ssh/known_hosts -R $fip
+# Host 10.0.0.214 found: line 8
+/home/stack/.ssh/known_hosts updated.
+Original contents retained as /home/stack/.ssh/known_hosts.old
+COUNT=0; until ssh -i $KEY_FILE -o StrictHostKeyChecking=no $ssh_user@$fip uptime || [ $COUNT -eq 10 ]; do sleep 5; echo $(( COUNT++ )); done
+ssh: connect to host 10.0.0.214 port 22: Connection refused
+0
+ssh: connect to host 10.0.0.214 port 22: Connection refused
+1
+ssh: connect to host 10.0.0.214 port 22: Connection refused
+2
+ssh: connect to host 10.0.0.214 port 22: Connection refused
+3
+ssh: connect to host 10.0.0.214 port 22: Connection refused
+4
+ssh: connect to host 10.0.0.214 port 22: Connection refused
+5
+Warning: Permanently added '10.0.0.214' (ECDSA) to the list of known hosts.
+ 04:26:04 up 1 min,  0 users,  load average: 1.07, 0.39, 0.14
+
+* Creating and booting VM instance: rhel75_vm2_net1, connected to network net_ipv64_1:
++-----------------------------+----------------------------------------------------+
+| Field                       | Value                                              |
++-----------------------------+----------------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                             |
+| OS-EXT-AZ:availability_zone |                                                    |
+| OS-EXT-STS:power_state      | NOSTATE                                            |
+| OS-EXT-STS:task_state       | scheduling                                         |
+| OS-EXT-STS:vm_state         | building                                           |
+| OS-SRV-USG:launched_at      | None                                               |
+| OS-SRV-USG:terminated_at    | None                                               |
+| accessIPv4                  |                                                    |
+| accessIPv6                  |                                                    |
+| addresses                   |                                                    |
+| adminPass                   | jQYeJfrd9D29                                       |
+| config_drive                |                                                    |
+| created                     | 2018-10-29T08:26:39Z                               |
+| flavor                      | rhel_flavor (1aedd8c3-2d1d-4a83-b6a1-c9fadb164763) |
+| hostId                      |                                                    |
+| id                          | 1bee8047-cde1-4d8e-9f9d-9f4ab28207eb               |
+| image                       | rhel75 (b52190e5-a03f-441b-aaf4-2d12966da10c)      |
+| key_name                    | tester-key                                         |
+| name                        | rhel75_vm2_net1                                    |
+| progress                    | 0                                                  |
+| project_id                  | 49c6c937056f4bb99084f33321c4e5a4                   |
+| properties                  |                                                    |
+| security_groups             | name='65773414-4929-4fcb-b39b-a877a5d7399e'        |
+| status                      | BUILD                                              |
+| updated                     | 2018-10-29T08:26:39Z                               |
+| user_id                     | 57779ed323df4fbf818879bda5f7952c                   |
+| volumes_attached            |                                                    |
++-----------------------------+----------------------------------------------------+
+| name                        | rhel75_vm2_net1                                          |
+| progress                    | 0                                                        |
+| project_id                  | 49c6c937056f4bb99084f33321c4e5a4                         |
+| properties                  |                                                          |
+| security_groups             | name='sec_group'                                         |
+| status                      | ACTIVE                                                   |
+
+* Adding floating ip 10.0.0.211 to rhel75_vm2_net1, and checking connectivity:
+
+* Setting a name to the port of the new floating ip: "rhel75_vm2_net1_10.0.0.211"
++-----------------------+------------------------------------------------------------------------------------------+
+| Field                 | Value                                                                                    |
++-----------------------+------------------------------------------------------------------------------------------+
+| admin_state_up        | UP                                                                                       |
+| allowed_address_pairs |                                                                                          |
+| binding_host_id       | None                                                                                     |
+| binding_profile       | None                                                                                     |
+| binding_vif_details   | None                                                                                     |
+| binding_vif_type      | None                                                                                     |
+| binding_vnic_type     | normal                                                                                   |
+| created_at            | 2018-10-29T08:26:49Z                                                                     |
+| data_plane_status     | None                                                                                     |
+| description           |                                                                                          |
+| device_id             | 1bee8047-cde1-4d8e-9f9d-9f4ab28207eb                                                     |
+| device_owner          | compute:nova                                                                             |
+| dns_assignment        | None                                                                                     |
+| dns_domain            | None                                                                                     |
+| dns_name              | None                                                                                     |
+| extra_dhcp_opts       |                                                                                          |
+| fixed_ips             | ip_address='10.0.1.21', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                 |
+|                       | ip_address='2001::f816:3eff:fea1:f6dd', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72' |
+| id                    | 099f9add-d321-427b-bea3-2a9987c2e79e                                                     |
+| mac_address           | fa:16:3e:a1:f6:dd                                                                        |
+| name                  | rhel75_vm2_net1_10.0.0.211                                                               |
+| network_id            | 9d8658e6-2c12-4163-9789-532007fd7c20                                                     |
+| port_security_enabled | True                                                                                     |
+| project_id            | 49c6c937056f4bb99084f33321c4e5a4                                                         |
+| qos_policy_id         | None                                                                                     |
+| revision_number       | 5                                                                                        |
+| security_group_ids    | 65773414-4929-4fcb-b39b-a877a5d7399e                                                     |
+| status                | ACTIVE                                                                                   |
+| tags                  |                                                                                          |
+| trunk_details         | None                                                                                     |
+| updated_at            | 2018-10-29T08:28:13Z                                                                     |
++-----------------------+------------------------------------------------------------------------------------------+
+
+* Waiting for Port status to be ACTIVE on rhel75_vm2_net1, with internal IP address 10.0.1.21:
+| dns_domain            | None                                                                                     |
+| dns_name              | None                                                                                     |
+| extra_dhcp_opts       |                                                                                          |
+| fixed_ips             | ip_address='10.0.1.21', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                 |
+|                       | ip_address='2001::f816:3eff:fea1:f6dd', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72' |
+| id                    | 099f9add-d321-427b-bea3-2a9987c2e79e                                                     |
+| mac_address           | fa:16:3e:a1:f6:dd                                                                        |
+| name                  | rhel75_vm2_net1_10.0.0.211                                                               |
+| network_id            | 9d8658e6-2c12-4163-9789-532007fd7c20                                                     |
+| port_security_enabled | True                                                                                     |
+| project_id            | 49c6c937056f4bb99084f33321c4e5a4                                                         |
+| qos_policy_id         | None                                                                                     |
+| revision_number       | 5                                                                                        |
+| security_group_ids    | 65773414-4929-4fcb-b39b-a877a5d7399e                                                     |
+| status                | ACTIVE                                                                                   |
+PING 10.0.0.211 (10.0.0.211) 56(84) bytes of data.
+64 bytes from 10.0.0.211: icmp_seq=1 ttl=64 time=1.91 ms
+64 bytes from 10.0.0.211: icmp_seq=2 ttl=64 time=0.664 ms
+64 bytes from 10.0.0.211: icmp_seq=3 ttl=64 time=1.03 ms
+64 bytes from 10.0.0.211: icmp_seq=4 ttl=64 time=0.779 ms
+64 bytes from 10.0.0.211: icmp_seq=5 ttl=64 time=1.04 ms
+
+--- 10.0.0.211 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4003ms
+rtt min/avg/max/mdev = 0.664/1.089/1.919/0.441 ms
+Apache PHP Web Server:
+
+ Connected client: 10.0.0.47
+ Web server IP: 10.0.1.21
+ Web server port: 80
+
+ Host name: host-10-0-1-21
+ Operating system: Linux
+ Release name: 3.10.0-862.el7.x86_64
+ Version information: #1 SMP Wed Mar 21 18:14:51 EDT 2018
+ Machine type: x86_64
+
+
+* Generate ssh key to access rhel75_vm2_net1 on 10.0.0.211, and checking ssh uptime:
+ssh-keygen -f ~/.ssh/known_hosts -R $fip
+# Host 10.0.0.211 found: line 9
+/home/stack/.ssh/known_hosts updated.
+Original contents retained as /home/stack/.ssh/known_hosts.old
+COUNT=0; until ssh -i $KEY_FILE -o StrictHostKeyChecking=no $ssh_user@$fip uptime || [ $COUNT -eq 10 ]; do sleep 5; echo $(( COUNT++ )); done
+ssh: connect to host 10.0.0.211 port 22: Connection refused
+0
+Warning: Permanently added '10.0.0.211' (ECDSA) to the list of known hosts.
+ 04:28:31 up 0 min,  0 users,  load average: 1.38, 0.40, 0.14
+
+* Creating and booting VM instance: rhel75_vm1_net2, connected to network net_ipv64_2:
++-----------------------------+----------------------------------------------------+
+| Field                       | Value                                              |
++-----------------------------+----------------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                             |
+| OS-EXT-AZ:availability_zone |                                                    |
+| OS-EXT-STS:power_state      | NOSTATE                                            |
+| OS-EXT-STS:task_state       | scheduling                                         |
+| OS-EXT-STS:vm_state         | building                                           |
+| OS-SRV-USG:launched_at      | None                                               |
+| OS-SRV-USG:terminated_at    | None                                               |
+| accessIPv4                  |                                                    |
+| accessIPv6                  |                                                    |
+| addresses                   |                                                    |
+| adminPass                   | AvvKjeFQM94Q                                       |
+| config_drive                |                                                    |
+| created                     | 2018-10-29T08:29:06Z                               |
+| flavor                      | rhel_flavor (1aedd8c3-2d1d-4a83-b6a1-c9fadb164763) |
+| hostId                      |                                                    |
+| id                          | 34a4dff5-39fa-47a5-9dc7-60b26fc91633               |
+| image                       | rhel75 (b52190e5-a03f-441b-aaf4-2d12966da10c)      |
+| key_name                    | tester-key                                         |
+| name                        | rhel75_vm1_net2                                    |
+| progress                    | 0                                                  |
+| project_id                  | 49c6c937056f4bb99084f33321c4e5a4                   |
+| properties                  |                                                    |
+| security_groups             | name='65773414-4929-4fcb-b39b-a877a5d7399e'        |
+| status                      | BUILD                                              |
+| updated                     | 2018-10-29T08:29:06Z                               |
+| user_id                     | 57779ed323df4fbf818879bda5f7952c                   |
+| volumes_attached            |                                                    |
++-----------------------------+----------------------------------------------------+
+| name                        | rhel75_vm1_net2                                          |
+| progress                    | 0                                                        |
+| project_id                  | 49c6c937056f4bb99084f33321c4e5a4                         |
+| properties                  |                                                          |
+| security_groups             | name='sec_group'                                         |
+| status                      | ACTIVE                                                   |
+
+* Adding floating ip 10.0.0.223 to rhel75_vm1_net2, and checking connectivity:
+
+* Setting a name to the port of the new floating ip: "rhel75_vm1_net2_10.0.0.223"
++-----------------------+------------------------------------------------------------------------------------------+
+| Field                 | Value                                                                                    |
++-----------------------+------------------------------------------------------------------------------------------+
+| admin_state_up        | UP                                                                                       |
+| allowed_address_pairs |                                                                                          |
+| binding_host_id       | None                                                                                     |
+| binding_profile       | None                                                                                     |
+| binding_vif_details   | None                                                                                     |
+| binding_vif_type      | None                                                                                     |
+| binding_vnic_type     | normal                                                                                   |
+| created_at            | 2018-10-29T08:29:16Z                                                                     |
+| data_plane_status     | None                                                                                     |
+| description           |                                                                                          |
+| device_id             | 34a4dff5-39fa-47a5-9dc7-60b26fc91633                                                     |
+| device_owner          | compute:nova                                                                             |
+| dns_assignment        | None                                                                                     |
+| dns_domain            | None                                                                                     |
+| dns_name              | None                                                                                     |
+| extra_dhcp_opts       |                                                                                          |
+| fixed_ips             | ip_address='10.0.2.9', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                  |
+|                       | ip_address='2002::f816:3eff:fe03:65ae', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732' |
+| id                    | 5a553de5-89c2-46a1-abbb-6c9b73c5847f                                                     |
+| mac_address           | fa:16:3e:03:65:ae                                                                        |
+| name                  | rhel75_vm1_net2_10.0.0.223                                                               |
+| network_id            | fe184d9e-f02c-447f-bc9b-53403476cbee                                                     |
+| port_security_enabled | True                                                                                     |
+| project_id            | 49c6c937056f4bb99084f33321c4e5a4                                                         |
+| qos_policy_id         | None                                                                                     |
+| revision_number       | 5                                                                                        |
+| security_group_ids    | 65773414-4929-4fcb-b39b-a877a5d7399e                                                     |
+| status                | ACTIVE                                                                                   |
+| tags                  |                                                                                          |
+| trunk_details         | None                                                                                     |
+| updated_at            | 2018-10-29T08:30:25Z                                                                     |
++-----------------------+------------------------------------------------------------------------------------------+
+
+* Waiting for Port status to be ACTIVE on rhel75_vm1_net2, with internal IP address 10.0.2.9:
+| dns_domain            | None                                                                                     |
+| dns_name              | None                                                                                     |
+| extra_dhcp_opts       |                                                                                          |
+| fixed_ips             | ip_address='10.0.2.9', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                  |
+|                       | ip_address='2002::f816:3eff:fe03:65ae', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732' |
+| id                    | 5a553de5-89c2-46a1-abbb-6c9b73c5847f                                                     |
+| mac_address           | fa:16:3e:03:65:ae                                                                        |
+| name                  | rhel75_vm1_net2_10.0.0.223                                                               |
+| network_id            | fe184d9e-f02c-447f-bc9b-53403476cbee                                                     |
+| port_security_enabled | True                                                                                     |
+| project_id            | 49c6c937056f4bb99084f33321c4e5a4                                                         |
+| qos_policy_id         | None                                                                                     |
+| revision_number       | 5                                                                                        |
+| security_group_ids    | 65773414-4929-4fcb-b39b-a877a5d7399e                                                     |
+| status                | ACTIVE                                                                                   |
+PING 10.0.0.223 (10.0.0.223) 56(84) bytes of data.
+64 bytes from 10.0.0.223: icmp_seq=1 ttl=64 time=3.92 ms
+64 bytes from 10.0.0.223: icmp_seq=2 ttl=64 time=1.50 ms
+64 bytes from 10.0.0.223: icmp_seq=3 ttl=64 time=5.31 ms
+64 bytes from 10.0.0.223: icmp_seq=4 ttl=64 time=1.18 ms
+64 bytes from 10.0.0.223: icmp_seq=5 ttl=64 time=0.786 ms
+
+--- 10.0.0.223 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4003ms
+rtt min/avg/max/mdev = 0.786/2.542/5.312/1.766 ms
+curl: (7) Failed connect to 10.0.0.223:80; Connection refused
+
+* Generate ssh key to access rhel75_vm1_net2 on 10.0.0.223, and checking ssh uptime:
+ssh-keygen -f ~/.ssh/known_hosts -R $fip
+# Host 10.0.0.223 found: line 10
+/home/stack/.ssh/known_hosts updated.
+Original contents retained as /home/stack/.ssh/known_hosts.old
+COUNT=0; until ssh -i $KEY_FILE -o StrictHostKeyChecking=no $ssh_user@$fip uptime || [ $COUNT -eq 10 ]; do sleep 5; echo $(( COUNT++ )); done
+ssh: connect to host 10.0.0.223 port 22: Connection refused
+0
+ssh: connect to host 10.0.0.223 port 22: Connection refused
+1
+ssh: connect to host 10.0.0.223 port 22: Connection refused
+2
+ssh: connect to host 10.0.0.223 port 22: Connection refused
+3
+ssh: connect to host 10.0.0.223 port 22: Connection refused
+4
+ssh: connect to host 10.0.0.223 port 22: Connection refused
+5
+Warning: Permanently added '10.0.0.223' (ECDSA) to the list of known hosts.
+ 04:31:08 up 1 min,  0 users,  load average: 1.00, 0.32, 0.11
+
+* Creating and booting VM instance: rhel75_vm2_net2, connected to network net_ipv64_2:
++-----------------------------+----------------------------------------------------+
+| Field                       | Value                                              |
++-----------------------------+----------------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                             |
+| OS-EXT-AZ:availability_zone |                                                    |
+| OS-EXT-STS:power_state      | NOSTATE                                            |
+| OS-EXT-STS:task_state       | scheduling                                         |
+| OS-EXT-STS:vm_state         | building                                           |
+| OS-SRV-USG:launched_at      | None                                               |
+| OS-SRV-USG:terminated_at    | None                                               |
+| accessIPv4                  |                                                    |
+| accessIPv6                  |                                                    |
+| addresses                   |                                                    |
+| adminPass                   | aGzBvgWxT86z                                       |
+| config_drive                |                                                    |
+| created                     | 2018-10-29T08:31:42Z                               |
+| flavor                      | rhel_flavor (1aedd8c3-2d1d-4a83-b6a1-c9fadb164763) |
+| hostId                      |                                                    |
+| id                          | 359ce6ab-c658-4019-8235-26f12385be0e               |
+| image                       | rhel75 (b52190e5-a03f-441b-aaf4-2d12966da10c)      |
+| key_name                    | tester-key                                         |
+| name                        | rhel75_vm2_net2                                    |
+| progress                    | 0                                                  |
+| project_id                  | 49c6c937056f4bb99084f33321c4e5a4                   |
+| properties                  |                                                    |
+| security_groups             | name='65773414-4929-4fcb-b39b-a877a5d7399e'        |
+| status                      | BUILD                                              |
+| updated                     | 2018-10-29T08:31:42Z                               |
+| user_id                     | 57779ed323df4fbf818879bda5f7952c                   |
+| volumes_attached            |                                                    |
++-----------------------------+----------------------------------------------------+
+| name                        | rhel75_vm2_net2                                          |
+| progress                    | 0                                                        |
+| project_id                  | 49c6c937056f4bb99084f33321c4e5a4                         |
+| properties                  |                                                          |
+| security_groups             | name='sec_group'                                         |
+| status                      | ACTIVE                                                   |
+
+* Adding floating ip 10.0.0.212 to rhel75_vm2_net2, and checking connectivity:
+
+* Setting a name to the port of the new floating ip: "rhel75_vm2_net2_10.0.0.212"
++-----------------------+------------------------------------------------------------------------------------------+
+| Field                 | Value                                                                                    |
++-----------------------+------------------------------------------------------------------------------------------+
+| admin_state_up        | UP                                                                                       |
+| allowed_address_pairs |                                                                                          |
+| binding_host_id       | None                                                                                     |
+| binding_profile       | None                                                                                     |
+| binding_vif_details   | None                                                                                     |
+| binding_vif_type      | None                                                                                     |
+| binding_vnic_type     | normal                                                                                   |
+| created_at            | 2018-10-29T08:31:49Z                                                                     |
+| data_plane_status     | None                                                                                     |
+| description           |                                                                                          |
+| device_id             | 359ce6ab-c658-4019-8235-26f12385be0e                                                     |
+| device_owner          | compute:nova                                                                             |
+| dns_assignment        | None                                                                                     |
+| dns_domain            | None                                                                                     |
+| dns_name              | None                                                                                     |
+| extra_dhcp_opts       |                                                                                          |
+| fixed_ips             | ip_address='10.0.2.14', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                 |
+|                       | ip_address='2002::f816:3eff:fe70:970a', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732' |
+| id                    | dc530e65-4298-47ef-9aaf-49c6ab31d47b                                                     |
+| mac_address           | fa:16:3e:70:97:0a                                                                        |
+| name                  | rhel75_vm2_net2_10.0.0.212                                                               |
+| network_id            | fe184d9e-f02c-447f-bc9b-53403476cbee                                                     |
+| port_security_enabled | True                                                                                     |
+| project_id            | 49c6c937056f4bb99084f33321c4e5a4                                                         |
+| qos_policy_id         | None                                                                                     |
+| revision_number       | 5                                                                                        |
+| security_group_ids    | 65773414-4929-4fcb-b39b-a877a5d7399e                                                     |
+| status                | ACTIVE                                                                                   |
+| tags                  |                                                                                          |
+| trunk_details         | None                                                                                     |
+| updated_at            | 2018-10-29T08:32:56Z                                                                     |
++-----------------------+------------------------------------------------------------------------------------------+
+
+* Waiting for Port status to be ACTIVE on rhel75_vm2_net2, with internal IP address 10.0.2.14:
+| dns_domain            | None                                                                                     |
+| dns_name              | None                                                                                     |
+| extra_dhcp_opts       |                                                                                          |
+| fixed_ips             | ip_address='10.0.2.14', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                 |
+|                       | ip_address='2002::f816:3eff:fe70:970a', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732' |
+| id                    | dc530e65-4298-47ef-9aaf-49c6ab31d47b                                                     |
+| mac_address           | fa:16:3e:70:97:0a                                                                        |
+| name                  | rhel75_vm2_net2_10.0.0.212                                                               |
+| network_id            | fe184d9e-f02c-447f-bc9b-53403476cbee                                                     |
+| port_security_enabled | True                                                                                     |
+| project_id            | 49c6c937056f4bb99084f33321c4e5a4                                                         |
+| qos_policy_id         | None                                                                                     |
+| revision_number       | 5                                                                                        |
+| security_group_ids    | 65773414-4929-4fcb-b39b-a877a5d7399e                                                     |
+| status                | ACTIVE                                                                                   |
+PING 10.0.0.212 (10.0.0.212) 56(84) bytes of data.
+64 bytes from 10.0.0.212: icmp_seq=1 ttl=64 time=2.19 ms
+64 bytes from 10.0.0.212: icmp_seq=2 ttl=64 time=1.22 ms
+64 bytes from 10.0.0.212: icmp_seq=3 ttl=64 time=0.811 ms
+64 bytes from 10.0.0.212: icmp_seq=4 ttl=64 time=1.04 ms
+64 bytes from 10.0.0.212: icmp_seq=5 ttl=64 time=0.695 ms
+
+--- 10.0.0.212 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4004ms
+rtt min/avg/max/mdev = 0.695/1.193/2.192/0.532 ms
+Apache PHP Web Server:
+
+ Connected client: 10.0.0.47
+ Web server IP: 10.0.2.14
+ Web server port: 80
+
+ Host name: host-10-0-2-14
+ Operating system: Linux
+ Release name: 3.10.0-862.el7.x86_64
+ Version information: #1 SMP Wed Mar 21 18:14:51 EDT 2018
+ Machine type: x86_64
+
+
+* Generate ssh key to access rhel75_vm2_net2 on 10.0.0.212, and checking ssh uptime:
+ssh-keygen -f ~/.ssh/known_hosts -R $fip
+# Host 10.0.0.212 found: line 14
+/home/stack/.ssh/known_hosts updated.
+Original contents retained as /home/stack/.ssh/known_hosts.old
+COUNT=0; until ssh -i $KEY_FILE -o StrictHostKeyChecking=no $ssh_user@$fip uptime || [ $COUNT -eq 10 ]; do sleep 5; echo $(( COUNT++ )); done
+ssh: connect to host 10.0.0.212 port 22: Connection refused
+0
+ssh: connect to host 10.0.0.212 port 22: Connection refused
+1
+ssh: connect to host 10.0.0.212 port 22: Connection refused
+2
+ssh: connect to host 10.0.0.212 port 22: Connection refused
+3
+ssh: connect to host 10.0.0.212 port 22: Connection refused
+4
+Warning: Permanently added '10.0.0.212' (ECDSA) to the list of known hosts.
+ 04:33:34 up 1 min,  0 users,  load average: 1.18, 0.41, 0.15
++--------------------------------------+-------------+--------+-------+-------------+------+----------------------------------+
+| ID                                   | Name        | Status | State | Distributed | HA   | Project                          |
++--------------------------------------+-------------+--------+-------+-------------+------+----------------------------------+
+| 5425d7c8-ed6f-475a-9903-2d79cef3015e | Router_eNet | ACTIVE | UP    | None        | None | 49c6c937056f4bb99084f33321c4e5a4 |
++--------------------------------------+-------------+--------+-------+-------------+------+----------------------------------+
++--------------------------------------+----------------------------+-------------------+------------------------------------------------------------------------------------------+--------+
+| ID                                   | Name                       | MAC Address       | Fixed IP Addresses                                                                       | Status |
++--------------------------------------+----------------------------+-------------------+------------------------------------------------------------------------------------------+--------+
+| 034805d1-e9fd-4ef2-a635-c322f0730819 |                            | fa:16:3e:4b:0e:2e | ip_address='10.0.2.3', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                  | ACTIVE |
+|                                      |                            |                   | ip_address='2002::f816:3eff:fe4b:e2e', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732'  |        |
+| 0518615c-f3ad-4fab-a240-012abd676f30 |                            | fa:16:3e:18:2b:6a | ip_address='10.0.1.2', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                  | ACTIVE |
+|                                      |                            |                   | ip_address='2001::f816:3eff:fe18:2b6a', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72' |        |
+| 099f9add-d321-427b-bea3-2a9987c2e79e | rhel75_vm2_net1_10.0.0.211 | fa:16:3e:a1:f6:dd | ip_address='10.0.1.21', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                 | ACTIVE |
+|                                      |                            |                   | ip_address='2001::f816:3eff:fea1:f6dd', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72' |        |
+| 1919086f-3c8a-4544-a9b4-01777fdc8169 |                            | fa:16:3e:84:b5:38 | ip_address='10.0.1.3', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                  | ACTIVE |
+|                                      |                            |                   | ip_address='2001::f816:3eff:fe84:b538', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72' |        |
+| 2d753059-b0c9-40d0-b81f-a995a71d37f5 |                            | fa:16:3e:d2:d9:bb | ip_address='10.0.1.1', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                  | DOWN   |
+| 4cde9560-27c9-4eca-9c2e-b7707e2f9ece |                            | fa:16:3e:7a:9d:c3 | ip_address='10.0.2.1', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                  | DOWN   |
+| 5a553de5-89c2-46a1-abbb-6c9b73c5847f | rhel75_vm1_net2_10.0.0.223 | fa:16:3e:03:65:ae | ip_address='10.0.2.9', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                  | ACTIVE |
+|                                      |                            |                   | ip_address='2002::f816:3eff:fe03:65ae', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732' |        |
+| 6eddfe2d-320f-4224-8aca-826ab97361ce |                            | fa:16:3e:b9:89:3d | ip_address='2001::1', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72'                   | DOWN   |
+| 7979b3d9-d2a0-42bc-a259-2c8d66a43f0b |                            | fa:16:3e:d6:07:7f | ip_address='10.0.1.4', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                  | ACTIVE |
+|                                      |                            |                   | ip_address='2001::f816:3eff:fed6:77f', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72'  |        |
+| 7f06e3a8-9a5d-45a2-8b21-92d7df3b1ecd |                            | fa:16:3e:c6:bf:15 | ip_address='2002::1', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732'                   | DOWN   |
+| a0ace291-dbf5-4a2e-9af2-7adc89ec89e4 | rhel75_vm1_net1_10.0.0.214 | fa:16:3e:43:df:1d | ip_address='10.0.1.18', subnet_id='85cc205c-9a12-4f75-8352-e40f040210f2'                 | ACTIVE |
+|                                      |                            |                   | ip_address='2001::f816:3eff:fe43:df1d', subnet_id='7d71ab03-363a-434f-8d0e-beeeba93da72' |        |
+| d0c23210-cefb-42f7-80b5-5d0b33656c19 |                            | fa:16:3e:69:fc:1a | ip_address='10.0.2.2', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                  | ACTIVE |
+|                                      |                            |                   | ip_address='2002::f816:3eff:fe69:fc1a', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732' |        |
+| dc530e65-4298-47ef-9aaf-49c6ab31d47b | rhel75_vm2_net2_10.0.0.212 | fa:16:3e:70:97:0a | ip_address='10.0.2.14', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                 | ACTIVE |
+|                                      |                            |                   | ip_address='2002::f816:3eff:fe70:970a', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732' |        |
+| e31e1dad-613a-4296-8dbc-86aa69be4f2d |                            | fa:16:3e:45:d5:34 | ip_address='10.0.2.4', subnet_id='d00b725c-6ffc-4a20-83f1-84fd3993f220'                  | ACTIVE |
+|                                      |                            |                   | ip_address='2002::f816:3eff:fe45:d534', subnet_id='962a514e-9890-41e1-954b-0f8ab463a732' |        |
++--------------------------------------+----------------------------+-------------------+------------------------------------------------------------------------------------------+--------+
++--------------------------------------+-----------------+--------+--------------------------------------------------------------+--------+-------------+
+| ID                                   | Name            | Status | Networks                                                     | Image  | Flavor      |
++--------------------------------------+-----------------+--------+--------------------------------------------------------------+--------+-------------+
+| 359ce6ab-c658-4019-8235-26f12385be0e | rhel75_vm2_net2 | ACTIVE | net_ipv64_2=2002::f816:3eff:fe70:970a, 10.0.2.14, 10.0.0.212 | rhel75 | rhel_flavor |
+| 34a4dff5-39fa-47a5-9dc7-60b26fc91633 | rhel75_vm1_net2 | ACTIVE | net_ipv64_2=2002::f816:3eff:fe03:65ae, 10.0.2.9, 10.0.0.223  | rhel75 | rhel_flavor |
+| 1bee8047-cde1-4d8e-9f9d-9f4ab28207eb | rhel75_vm2_net1 | ACTIVE | net_ipv64_1=2001::f816:3eff:fea1:f6dd, 10.0.1.21, 10.0.0.211 | rhel75 | rhel_flavor |
+| 5be427f2-5cc6-4614-9345-d36d72bc9265 | rhel75_vm1_net1 | ACTIVE | net_ipv64_1=2001::f816:3eff:fe43:df1d, 10.0.1.18, 10.0.0.214 | rhel75 | rhel_flavor |
++--------------------------------------+-----------------+--------+--------------------------------------------------------------+--------+-------------+
+
+----------------------------------------------------------------------------------------------------
+Creating and testing multiple VMs and Networks completed. Please verify output contains no failures.
+
+To SSH into VM:
+ssh -i tester_key.pem cloud-user@SERVER_FIP
+[stack@undercloud-0 ~]$
