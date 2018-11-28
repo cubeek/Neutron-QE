@@ -1,6 +1,6 @@
 #!/bin/bash
 
-openstack overcloud deploy  \
+openstack overcloud deploy \
 --templates \
 --timeout 120 \
 -r /home/stack/ospd-14-vlan-multiple-nic-sriov-hybrid-ha/roles_data.yaml \
