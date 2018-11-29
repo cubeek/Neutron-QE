@@ -42,7 +42,7 @@ parameter_defaults:
   # The Neutron ML2 and OpenVSwitch vlan mapping range to support.
   NeutronNetworkVLANRanges: 'datacentre:181:181,datacentre:225:229'
   # Nova flavor to use.
-  OvercloudControlFlavor: controller
+  OvercloudControllerFlavor: controller
   OvercloudComputeSriovFlavor: compute
   # Number of nodes to deploy.
   ControllerCount: 3
