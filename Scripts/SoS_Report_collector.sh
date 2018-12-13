@@ -1,4 +1,12 @@
 #!/bin/bash
+##########################################################################################
+# Maintained by Eran Kuris and Noam Manos, 2018 ##########################################
+#
+# This script creates RHEL SOS-REPORTs on Openstack Undercloud and on all Overcloud nodes,
+# and uploads it to http://rhos-release.virt.bos.redhat.com/log
+# with a BZ number (or current date if BZ not specified) as URL to be added to Bugzilla.
+#
+##########################################################################################
 
 if [ "$USER" != "stack" ];then
     echo "Must use the stack user. Exiting."
@@ -13,6 +21,12 @@ else
     source $ENV_FILE
 fi
 
+read -p "Please enter your kerberos username: " username
+read -s -p "Please enter your kerberos password: " password
+echo ""
+read -p "Please enter the bz ID you provide the sosreports for: " bug_id
+
+
 echo "Attempting to install sshpass"
 sudo yum install -y sshpass
 if [ "$?" != "0" ]; then
@@ -20,29 +34,35 @@ if [ "$?" != "0" ]; then
    exit 1
 fi
 
-read -p "Please enter your kerberos username: " username
-read -s -p "Please enter your kerberos password: " password
-echo ""
-read -p "Please enter the bz ID you provide the sosreports for: " bug_id
+timestamp="`date +%d-%m-%Y_%H%M`"
+SOSREPORTS_DIR="sosreports/$timestamp"
+REMOTE_DIR="/var/www/html/log/bz${bug_id:-$timestamp}"
+SOS_CMD="sudo sosreport --verbose --batch --tmp-dir $SOSREPORTS_DIR --alloptions --profile=openstack,openstack_undercloud,openstack_controller --enable-plugins=openstack_neutron"
 
-SOSREPORTS_DIR="sosreports"
-REMOTE_DIR=/var/www/html/log/bz${bug_id}
 echo "Creating the directory on a corporate machine"
-sshpass -p $password ssh -o StrictHostKeyChecking=no ${username}@rhos-release.virt.bos.redhat.com "if [ ! -d $REMOTE_DIR ]; then mkdir $REMOTE_DIR; fi"
+sshpass -p $password ssh -o StrictHostKeyChecking=no ${username}@rhos-release.virt.bos.redhat.com "if [ ! -d $REMOTE_DIR ]; then mkdir -p $REMOTE_DIR; fi"
 
+echo "Creating the directory on local host (Undercloud)"
 if [ ! -d $SOSREPORTS_DIR ]; then
-    mkdir $SOSREPORTS_DIR;
+    mkdir -p $SOSREPORTS_DIR;
 fi
-for i in `nova list|awk '/ACTIVE/ {print $(NF-1)}'|awk -F"=" '{print $NF}'`; do echo $i; ssh -o StrictHostKeyChecking=no heat-admin@$i "sudo sosreport --batch; sudo chown heat-admin  /var/tmp/sosreport*"; scp -o StrictHostKeyChecking=no heat-admin@$i:/var/tmp/sosreport*.tar.xz $SOSREPORTS_DIR; done
 
-sudo sosreport --batch; sudo cp /var/tmp/sosreport*.tar.xz $SOSREPORTS_DIR
+for node in `nova list|awk '/ACTIVE/ {print $(NF-1)}'|awk -F"=" '{print $NF}'`; do
+  echo "Generating SOS Report on $node";
+  ssh -o StrictHostKeyChecking=no heat-admin@$node "if [ ! -d $SOSREPORTS_DIR ]; then sudo mkdir -p $SOSREPORTS_DIR; fi"
+  ssh -o StrictHostKeyChecking=no heat-admin@$node "$SOS_CMD; sudo tar tvf $SOSREPORTS_DIR/*.tar.xz | grep var/log; sudo chown heat-admin $SOSREPORTS_DIR/*";
+  scp -o StrictHostKeyChecking=no heat-admin@$node:$SOSREPORTS_DIR/sosreport*.tar.xz $SOSREPORTS_DIR;
+done
+
+echo "Generating SOS Report on local host (Undercloud)"
+$SOS_CMD
 sudo chown $USER $SOSREPORTS_DIR/*
 
 echo "Copying the results to the publicly available URL"
-sshpass -p $password /usr/bin/scp -o StrictHostKeyChecking=no  $SOSREPORTS_DIR/*  ${username}@rhos-release.virt.bos.redhat.com:$REMOTE_DIR
+sshpass -p $password /usr/bin/scp -o StrictHostKeyChecking=no $SOSREPORTS_DIR/*  ${username}@rhos-release.virt.bos.redhat.com:$REMOTE_DIR
 sshpass -p $password ssh -o StrictHostKeyChecking=no ${username}@rhos-release.virt.bos.redhat.com "chmod go+r $REMOTE_DIR/*"
 if [ "$?" == "0" ]; then
-    echo "The reports should be available here: http://rhos-release.virt.bos.redhat.com/log/bz${bug_id}"
+    echo "The reports should be available here: http://rhos-release.virt.bos.redhat.com/log/bz${bug_id:-$timestamp}"
 else
     echo "Error! There was a problem uploading the sosreports."
     exit 1
