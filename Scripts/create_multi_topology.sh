@@ -63,7 +63,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 echo "----------------------------------------------------------------------
 This script will create and run:
 
-* Multiple VM instances (of type RHEL 7.5 / RHEL 7.4 / Cirros)
+* Multiple VM instances (of type RHEL 8.0 / RHEL 7.6 / RHEL 7.5 / RHEL 7.4 / Cirros)
 * Multiple Networks with IPv4 & Ipv6 subnets, and Floating IPs, connected to external router.
 * SSH Keypair and connectivity test.
 
@@ -71,7 +71,7 @@ Running with pre-defined parameters (optional):
 
 * To debug (verbose output):                            -d / --debug
 * To quit on first error:                               -q / --quit
-* To set VM image:                                      -i / --image    [ rhel74 / rhel75 / cirros35 ]
+* To set VM image:                                      -i / --image    [ rhel74 / rhel75 / rhel76 / rhel8 / cirros35 ]
 * To set topology - Multiple VMs or multiple NICs:      -t / --topology [ mni = Multiple Networks Intrfaces / mvi = Multiple VM Instances ]
 * To set the number of networks:                        -n / --networks [ 1-100 ]
 * To set the number of VMs:                             -v / --machines [ 1-100 ]
@@ -115,9 +115,9 @@ cat /etc/yum.repos.d/rhos-release-*.repo | grep -m 1 puddle_baseurl
 
 osp_version=$(echo $osp_version | awk '{print $1}')
 
-while ! [[ "$image" =~ ^(rhel74|rhel75|cirros35)$ ]]
+while ! [[ "$image" =~ ^(rhel74|rhel75|rhel76|rhel8|cirros35)$ ]]
 do
-  echo -e "\nWhich image do you want to use: rhel74 / rhel75 / cirros35 ?"
+  echo -e "\nWhich image do you want to use: rhel74 / rhel75 / rhel76 / rhel8 / cirros35 ?"
   read -r image
 done
 
@@ -300,9 +300,26 @@ else
       #openstack image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.5-137.x86_64.qcow2
       wget -nc http://file.tlv.redhat.com/~nmanos/rhel-guest-image-7.5-146_apache_php.qcow2
       openstack image show $image || openstack $debug image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.5-146_apache_php.qcow2
+    else
+     if [[ $image = rhel76 ]]; then
+       # rhel v7.6 image
+       echo -e "\n* Creating RHEL v7.6 Image:"
+       #wget -N http://file.tlv.redhat.com/~ekuris/custom_ci_image/rhel-guest-image-7.5-137.x86_64.qcow2
+       #openstack image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.5-137.x86_64.qcow2
+       wget -nc http://rhos-qe-mirror-tlv.usersys.redhat.com/brewroot/packages/rhel-guest-image/7.6/210/images/rhel-guest-image-7.6-210.x86_64.qcow2
+       openstack image show $image || openstack $debug image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.6-210.x86_64.qcow2
+     else
+      if [[ $image = rhel8 ]]; then
+       # rhel v8 image
+       echo -e "\n* Creating RHEL v8 Image:"
+       #wget -N http://file.tlv.redhat.com/~ekuris/custom_ci_image/rhel-guest-image-7.5-137.x86_64.qcow2
+       #openstack image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.5-137.x86_64.qcow2
+       wget -nc http://rhos-qe-mirror-tlv.usersys.redhat.com/brewroot/packages/rhel-guest-image/8.0/1736/images/rhel-guest-image-8.0-1736.x86_64.qcow2
+       openstack image show $image || openstack $debug image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-8.0-1736.x86_64.qcow2
+      fi
+     fi
     fi
   fi
-
   # rhel flavor
   echo -e "\n* Creating RHEL Flavor:"
   flavor=rhel_flavor
@@ -409,6 +426,9 @@ openstack $debug security group rule create $sec_id --protocol tcp --dst-port 80
 openstack $debug security group rule create $sec_id --protocol tcp --dst-port 22 --remote-ip 0.0.0.0/0
 openstack $debug security group rule create $sec_id --protocol tcp --dst-port 443 --remote-ip 0.0.0.0/0
 openstack $debug security group rule create $sec_id --protocol icmp --dst-port -1 --remote-ip 0.0.0.0/0
+openstack $debug security group rule create $sec_id --protocol tcp --ingress --ethertype IPv6
+openstack $debug security group rule create $sec_id --protocol udp --ingress --ethertype IPv6
+openstack $debug security group rule create $sec_id --protocol icmp --ingress --ethertype IPv6
 
 # openstack $debug security group rule create --protocol icmp --ingress --prefix 0.0.0.0/0 $sec_id
 # openstack $debug security group rule create --protocol tcp --ingress --prefix 0.0.0.0/0 $sec_id
