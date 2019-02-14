@@ -66,6 +66,7 @@ export GREEN='\e[38;5;22m'
 export YELLOW='\e[1;33m'
 export NO_CLR='\e[0m' # No Color
 export HAT="${RED}🎩︎${NO_CLR}"
+
 export KEY_FILE=tester_key.pem
 export previous_vm=""
 export previous_fip=""
@@ -74,6 +75,17 @@ export ipv6_enable=YES
 export tenant_enable=YES
 export default_network_type=flat
 export default_physical_network=datacentre
+
+# RHEL Images
+export rhel_images_url='http://file.tlv.redhat.com/~nmanos/rhel-custom-images/'
+export RHEL74_IMG='rhel-guest-image-7.4-290_apache_php.qcow2'
+export RHEL75_IMG='rhel-guest-image-7.5-190_apache_php.qcow2'
+export RHEL76_IMG='rhel-guest-image-7.6-210_apache_php.qcow2'
+export RHEL80_IMG='rhel-guest-image-8.0-1736_apache_php.qcow2'
+
+# CIRROS Images
+export cirros35_images_url='https://download.cirros-cloud.net/0.3.5/'
+export CIRROS35_IMG='cirros-0.3.5-x86_64-disk.img'
 
 ####################################################################################
 
@@ -88,8 +100,8 @@ while [ $# -gt 0 ]; do
     echo "${disclosure}" && exit 0
     shift ;;
   -i|--image)
-    image="$2"
-    echo "VM image to use: $image"
+    img_name="$2"
+    echo "VM image to use: $img_name"
     shift 2 ;;
   -t|--topology)
     topology="$2"
@@ -110,7 +122,7 @@ while [ $# -gt 0 ]; do
     shift ;;
   --admin)
     tenant_enable=NO
-    echo "Create and test Non-Admin Tenant: $ipv6_enable"
+    echo "Create and test Non-Admin Tenant: $tenant_enable"
     shift ;;
   -e|--external)
     external_network_type="$2"
@@ -178,12 +190,19 @@ test_fip_port_active() {
 }
 
 run_in_ssh() {
+  trap_commands;
   prompt "Running within SSH $1 : $2"
   COUNT=0
-  until ssh -i $KEY_FILE -o StrictHostKeyChecking=no $1 "$2" || [ $COUNT -eq 10 ]; do
+  ATTEMPTS=5
+  until ssh -i $KEY_FILE -o StrictHostKeyChecking=no $1 "$2" || [[ $COUNT -eq $ATTEMPTS ]]; do
     echo -e "$(( COUNT++ )) ... \c"
     sleep 1
   done
+  if [[ $COUNT -eq $ATTEMPTS ]]; then
+    prompt "${RED} SSH command has failed. ${NO_CLR}"
+    return 1
+  fi
+  return 0
 }
 
 test_connectivity() {
@@ -264,11 +283,11 @@ run_cleanup() {
     for network in $(openstack network list --external -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug network delete $network; done
   fi
 
-  prompt "Deleting all VM images"
-  for img in $(openstack image list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug image delete $img; done
+  #prompt "Deleting all VM images"
+  #for img in $(openstack image list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug image delete $img; done
 
-  prompt "Deleting all VM flavors"
-  for flavor in $(openstack flavor list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug flavor delete $flavor; done
+  #prompt "Deleting all VM flavors"
+  #for flavor in $(openstack flavor list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug flavor delete $flavor; done
 
   prompt "Deleting all security groups"
   for secgroup in $(openstack security group list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug security group delete $secgroup; done
@@ -332,7 +351,7 @@ fi
 # Evaluating user input parameters
 
 # Getting VMs instances operating system image
-while ! [[ "$image" =~ ^(rhel74|rhel75|rhel76|rhel8|cirros35)$ ]]; do
+while ! [[ "$img_name" =~ ^(rhel74|rhel75|rhel76|rhel8|cirros35)$ ]]; do
   echo -e "\nWhich image do you want to use: rhel74 / rhel75 / rhel76 / rhel8 / cirros35 ?"
   read -r image
 done
@@ -445,11 +464,11 @@ fi
 ####################################################################################
 
 # Downloading and creating images & flavors (as Admin)
-if [[ $image = cirros35 ]]; then
+if [[ $img_name = cirros35 ]]; then
   # cirros image
   prompt "Creating CirrOS 0.3.5 Image"
-  wget -nc https://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img --no-check-certificate
-  openstack $debug image create --container-format bare --disk-format qcow2 --public --file cirros-0.3.5-x86_64-disk.img cirros35
+  wget -nc ${cirros35_images_url}${CIRROS35_IMG} --no-check-certificate
+  openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $CIRROS35_IMG
 
   # cirros flavor
   prompt "Creating CirrOS Flavor"
@@ -458,32 +477,29 @@ if [[ $image = cirros35 ]]; then
   ssh_user=cirros
 
 else
-  if [[ $image = rhel74 ]]; then
+  if [[ $img_name = rhel74 ]]; then
     # rhel v7.4 image
     prompt "Creating RHEL v7.4 Image"
-    wget -N http://file.tlv.redhat.com/~ekuris/custom_ci_image/rhel-guest-image-7.4-191.x86_64.qcow2
-    openstack image show $image || openstack $debug image create --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.4-191.x86_64.qcow2 rhel74
+    wget -N ${rhel_images_url}${RHEL74_IMG}
+    openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL74_IMG
   else
-    if [[ $image = rhel75 ]]; then
+    if [[ $img_name = rhel75 ]]; then
       # rhel v7.5 image
       prompt "Creating RHEL v7.5 Image"
-      #wget -nc http://file.tlv.redhat.com/~ekuris/custom_ci_image/rhel-guest-image-7.5-137.x86_64.qcow2
-      wget -N http://file.tlv.redhat.com/~nmanos/rhel-guest-image-7.5-146_apache_php.qcow2
-      openstack image show $image || openstack $debug image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.5-146_apache_php.qcow2
+      wget -N ${rhel_images_url}${RHEL75_IMG}
+      openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL75_IMG
     else
-      if [[ $image = rhel76 ]]; then
+      if [[ $img_name = rhel76 ]]; then
        # rhel v7.6 image
        prompt "Creating RHEL v7.6 Image"
-       #wget -nc http://file.tlv.redhat.com/~ekuris/custom_ci_image/rhel-guest-image-7.5-137.x86_64.qcow2
-       wget -N http://rhos-qe-mirror-tlv.usersys.redhat.com/brewroot/packages/rhel-guest-image/7.6/210/images/rhel-guest-image-7.6-210.x86_64.qcow2
-       openstack image show $image || openstack $debug image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-7.6-210.x86_64.qcow2
+       wget -N ${rhel_images_url}${RHEL76_IMG}
+       openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL76_IMG
       else
-        if [[ $image = rhel8 ]]; then
+        if [[ $img_name = rhel8 ]]; then
            # rhel v8 image
            prompt "Creating RHEL v8 Image"
-           #wget -nc http://file.tlv.redhat.com/~ekuris/custom_ci_image/rhel-guest-image-7.5-137.x86_64.qcow2
-           wget -N http://rhos-qe-mirror-tlv.usersys.redhat.com/brewroot/packages/rhel-guest-image/8.0/1736/images/rhel-guest-image-8.0-1736.x86_64.qcow2
-           openstack image show $image || openstack $debug image create $image --container-format bare --disk-format qcow2 --public --file rhel-guest-image-8.0-1736.x86_64.qcow2
+           wget -N ${rhel_images_url}${RHEL80_IMG}
+           openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL80_IMG
         fi
       fi
     fi
@@ -674,8 +690,8 @@ if  [[ $topology = mni ]];  then
   #Create VM instances:"
   prompt "Creating $inst_num VM instances:"
   for i in `seq 1 $inst_num`; do
-     image_id=$(openstack image list | grep $image | head -1 | cut -d " " -f 2)
-     vm_name=${image}_vm${i}
+     img_id=$(openstack image list | grep $img_name | head -1 | cut -d " " -f 2)
+     vm_name=${img_name}_vm${i}
 
      nics=""
      for n in `seq 1 $net_num`; do
@@ -684,13 +700,13 @@ if  [[ $topology = mni ]];  then
 
      prompt "Creating and booting VM instance with ${net_num} NICs: ${vm_name}"
 
-     #openstack server create --flavor $flavor --image $image_id $nics --security-group $sec_id --key-name tester-key $vm_name
+     #openstack server create --flavor $flavor --image $img_name_id $nics --security-group $sec_id --key-name tester-key $vm_name
      #until openstack server show $vm_name | grep -E 'ACTIVE' -B 5; do sleep 1 ; done
 
-     #openstack server create --flavor $flavor --image $image_id $nics --security-group $sec_id --key-name tester-key $vm_name |& tee _temp.out
+     #openstack server create --flavor $flavor --image $img_name_id $nics --security-group $sec_id --key-name tester-key $vm_name |& tee _temp.out
      #vm_id=$(cat _temp.out | awk -F'[ \t]*\\|[ \t]*' '/ id / {print $3}')
 
-     openstack $debug server create --flavor $flavor --image $image_id $nics --security-group $sec_id --key-name tester-key $vm_name
+     openstack $debug server create --flavor $flavor --image $img_id $nics --security-group $sec_id --key-name tester-key $vm_name
      vm_id=$(openstack server list -c ID -f value | head -1)
      until openstack server show $vm_id | grep -E 'ACTIVE' -B 5; do sleep 1 ; done
 
@@ -734,12 +750,12 @@ if  [[ $topology = mvi ]];  then
       #create one floating ip for each VM instance
       create_floating_ip;
 
-      image_id=$(openstack image list | grep $image | head -1 | cut -d " " -f 2)
-      vm_name=${image}_vm${i}_net${n}
+      img_id=$(openstack image list | grep $img_name | head -1 | cut -d " " -f 2)
+      vm_name=${img_name}_vm${i}_net${n}
 
       prompt "Creating and booting VM instance: ${vm_name}, connected to network int_net_${n}:"
 
-      openstack $debug server create --flavor $flavor --image $image_id --nic net-id=int_net_$n --security-group $sec_id --key-name tester-key $vm_name
+      openstack $debug server create --flavor $flavor --image $img_id --nic net-id=int_net_$n --security-group $sec_id --key-name tester-key $vm_name
 
       vm_id=$(openstack server list -c ID -f value | head -1)
       until openstack server show $vm_id | grep -E 'ACTIVE' -B 5; do sleep 1 ; done
