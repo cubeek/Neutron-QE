@@ -10,7 +10,7 @@ This is an interactive script to create and run:
 
 * Multiple VM instances (of type RHEL 8.0 / RHEL 7.6 / RHEL 7.5 / RHEL 7.4 / Cirros)
 * Multiple Networks with IPv4 & IPv6 subnets, and Floating IPs, connected to external network (Flat / Vlan)
-* Tests includes: SSH Keypair, non-admin Tanent, Security group for HTTP/S, North-South, East-West, SNAT.
+* Tests includes: SSH Keypair, non-admin Tenant, Security group for HTTP/S, North-South, East-West, SNAT.
 
 Running with pre-defined parameters (optional):
 
@@ -353,7 +353,7 @@ fi
 # Getting VMs instances operating system image
 while ! [[ "$img_name" =~ ^(rhel74|rhel75|rhel76|rhel8|cirros35)$ ]]; do
   echo -e "\nWhich image do you want to use: rhel74 / rhel75 / rhel76 / rhel8 / cirros35 ?"
-  read -r image
+  read -r img_name
 done
 
 # Getting VMs - Networks topology type
