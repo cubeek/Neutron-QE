@@ -36,7 +36,7 @@ parameter_defaults:
 
   DnsServers: ["10.46.0.31","10.46.0.32"]
   NeutronExternalNetworkBridge: "''"
-  NeutronNetworkType: 'vlan,flat'
+  NeutronNetworkType: 'vlan'
   NeutronTunnelTypes: ''
   NeutronBridgeMappings: 'datacentre:br-ext-int'
   NeutronNetworkVLANRanges: 'datacentre:319:319,datacentre:320:324'
