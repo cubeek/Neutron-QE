@@ -2,6 +2,7 @@ resource_registry:
   # Specify the relative/absolute path to the config files you want to use for override the default.
   OS::TripleO::ComputeSriov::Net::SoftwareConfig: nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
+  OS::TripleO::Services::NeutronDhcpAgent: /usr/share/openstack-tripleo-heat-templates/docker/services/neutron-dhcp.yaml
 parameter_defaults:
   # Customize all these values to match the local environment
   InternalApiNetCidr: 10.20.1.0/24
