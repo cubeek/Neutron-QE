@@ -37,7 +37,7 @@ fi
 timestamp="`date +%d-%m-%Y_%H%M`"
 SOSREPORTS_DIR="sosreports/$timestamp"
 REMOTE_DIR="/var/www/html/log/bz${bug_id:-$timestamp}"
-SOS_CMD="sudo sosreport --verbose --batch --tmp-dir $SOSREPORTS_DIR --alloptions --profile=openstack,openstack_undercloud,openstack_controller --enable-plugins=openstack_neutron"
+SOS_CMD="sudo sosreport --verbose --batch --tmp-dir $SOSREPORTS_DIR --alloptions --profile=cluster,openstack,openstack_undercloud,openstack_controller --enable-plugins=openstack_neutron"
 
 echo "Creating the directory on a corporate machine"
 sshpass -p $password ssh -o StrictHostKeyChecking=no ${username}@rhos-release.virt.bos.redhat.com "if [ ! -d $REMOTE_DIR ]; then mkdir -p $REMOTE_DIR; fi"
