@@ -37,7 +37,7 @@ fi
 timestamp="`date +%d-%m-%Y_%H%M`"
 SOSREPORTS_DIR="sosreports/$timestamp"
 REMOTE_DIR="/var/www/html/log/bz${bug_id:-$timestamp}"
-SOS_CMD="sudo sosreport --verbose --batch --tmp-dir $SOSREPORTS_DIR --alloptions --profile=cluster,openstack,openstack_undercloud,openstack_controller --enable-plugins=openstack_neutron"
+SOS_CMD="sudo sosreport --verbose --batch --tmp-dir $SOSREPORTS_DIR --alloptions --enable-plugins=openstack_neutron --profile=openstack,openstack_undercloud,openstack_controller"
 
 echo "Creating the directory on a corporate machine"
 sshpass -p $password ssh -o StrictHostKeyChecking=no ${username}@rhos-release.virt.bos.redhat.com "if [ ! -d $REMOTE_DIR ]; then mkdir -p $REMOTE_DIR; fi"
@@ -50,7 +50,7 @@ fi
 for node in `nova list|awk '/ACTIVE/ {print $(NF-1)}'|awk -F"=" '{print $NF}'`; do
   echo "Generating SOS Report on $node";
   ssh -o StrictHostKeyChecking=no heat-admin@$node "if [ ! -d $SOSREPORTS_DIR ]; then sudo mkdir -p $SOSREPORTS_DIR; fi"
-  ssh -o StrictHostKeyChecking=no heat-admin@$node "$SOS_CMD; sudo tar tvf $SOSREPORTS_DIR/*.tar.xz | grep var/log; sudo chown heat-admin $SOSREPORTS_DIR/*";
+  ssh -o StrictHostKeyChecking=no heat-admin@$node "$SOS_CMD,cluster; sudo tar tvf $SOSREPORTS_DIR/*.tar.xz | grep var/log; sudo chown heat-admin $SOSREPORTS_DIR/*";
   scp -o StrictHostKeyChecking=no heat-admin@$node:$SOSREPORTS_DIR/sosreport*.tar.xz $SOSREPORTS_DIR;
 done
 
