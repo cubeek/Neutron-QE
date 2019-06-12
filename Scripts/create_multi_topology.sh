@@ -15,17 +15,18 @@ This is an interactive script to create and run:
 Running with pre-defined parameters (optional):
 
 * To show this help menu:                               -h / --help
-* To trace BASH commands:                               -x / --trace
-* To debug OpenStack commands                           -d / --debug
-* To quit on first error:                               -q / --quit
-* To skip IPv6 tests (only IPv4 tests):                      --no-ipv6
-* To test as Admin user (no tenant):                         --admin
 * To set VM image:                                      -i / --image    [ rhel74 / rhel75 / rhel76 / rhel8 / cirros35 ]
 * To set topology - Multiple VMs or multiple NICs:      -t / --topology [ mni = Multiple Networks Interfaces / mvi = Multiple VM Instances ]
 * To set the number of networks:                        -n / --networks [ 1-100 ]
 * To set the number of VMs:                             -v / --machines [ 1-100 ]
 * To create external network:                           -e / --external [ flat / vlan / skip ]
+* To skip IPv6 tests (only IPv4 tests):                      --no-ipv6
+* To test as Admin user (no tenant):                         --admin
 * To run environment cleanup initially:                 -c / --cleanup  [ NO / YES / ONLY ]
+* To quit on first error:                               -q / --quit     [ YES (default) / NO ]
+* To trace BASH commands:                               -x / --trace
+* To debug OpenStack commands                           -d / --debug
+
 
 Command examples:
 
@@ -33,7 +34,7 @@ Command examples:
 
   Will run interactively (enter choices during execution).
 
-# ./create_multi_topology.sh -x -q -t mvi -i cirros35 -n 2 -v 2 -e skip -c YES
+# ./create_multi_topology.sh -x -t mvi -i cirros35 -n 2 -v 2 -e skip -c YES
 
   Will create and test Multiple VMs (4 total).
   On each of the 2 Networks - 2 CirrOS connected:
@@ -42,7 +43,7 @@ Command examples:
   Net1 -|                 Net2 -|
          <--> CirrOS2            <--> CirrOS4
 
-# ./create_multi_topology.sh -q -t mni -i rhel8 -n 2 -v 2 -e skip -c YES
+# ./create_multi_topology.sh -t mni -i rhel8 -n 2 -v 2 -e skip -c YES
 
   Will create and test Multiple NICs (4 total).
   On each of the 2 RHEL8 - 2 NICs connected:
@@ -91,6 +92,10 @@ export CIRROS35_IMG='cirros-0.3.5-x86_64-disk.img'
 
 # CLI user options
 
+check_cli_args() {
+  [[ -z "$1" ]] && echo "Missing arguments. Please see Help with: -h" && exit 1
+}
+
 shopt -s nocasematch # No case sensitive match for cli options
 POSITIONAL=()
 while [ $# -gt 0 ]; do
@@ -100,19 +105,23 @@ while [ $# -gt 0 ]; do
     echo "${disclosure}" && exit 0
     shift ;;
   -i|--image)
+    check_cli_args $2
     img_name="$2"
     echo "VM image to use: $img_name"
     shift 2 ;;
   -t|--topology)
+    check_cli_args $2
     topology="$2"
     [[ $topology = mni ]] && echo "Topology to create: Multiple NICs per virtual-machine"
     [[ $topology = mvi ]] && echo "Topology to create: Multiple VMs per network"
     shift 2 ;;
   -n|--networks)
+    check_cli_args $2
     net_num="$2"
     echo "Number of Networks to create: $net_num"
     shift 2 ;;
   -v|--machines)
+    check_cli_args $2
     inst_num="$2"
     echo "Number of VMs to create: $inst_num"
     shift 2 ;;
@@ -125,10 +134,12 @@ while [ $# -gt 0 ]; do
     echo "Create and test Non-Admin Tenant: $tenant_enable"
     shift ;;
   -e|--external)
+    check_cli_args $2
     external_network_type="$2"
     echo "External network type to create: $external_network_type"
     shift 2 ;;
   -c|--cleanup)
+    check_cli_args $2
     cleanup_needed="$2"
     echo "CLEANUP all OpenStack objects initially: $cleanup_needed"
     shift 2 ;;
@@ -141,8 +152,10 @@ while [ $# -gt 0 ]; do
     echo "Tracing BASH commands"
     shift ;;
   -q|--quit)
-    quit_on_error=YES
-    shift ;;
+    check_cli_args $2
+    quit_on_error="$2"
+    echo "Quit on first error: $quit_on_error"
+    shift 2 ;;
   -*)
     echo "$0: Error - unrecognized option $1" 1>&2
     echo "${disclosure}" && exit 1 ;;
@@ -170,6 +183,20 @@ trap_commands() {
   fi
 }
 export -f trap_commands
+
+download_file() {
+  trap_commands;
+  # To download file from URL, if local file doesn't exists, or has a different size on URL
+  FILE_URL=$1
+  FILE_NAME=$2
+  # wget does not always exists on hosts, using curl instead
+  # wget -nc ${FILE_URL}${FILE_NAME} --no-check-certificate
+  local_file_size=$([[ -f ${FILE_NAME} ]] && wc -c < ${FILE_NAME} || echo "0")
+  remote_file_size=$(curl -sI ${FILE_URL}${FILE_NAME} | awk '/Content-Length/ { print $2 }' | tr -d '\r' )
+  if [[ "$local_file_size" -ne "$remote_file_size" ]]; then
+      curl -o ${FILE_NAME} ${FILE_URL}${FILE_NAME}
+  fi
+}
 
 create_floating_ip() {
   trap_commands;
@@ -304,7 +331,10 @@ run_cleanup() {
 # Evaluating general script options
 
 # When using -q / --quit option, the script will stop executing on first error
-[[ "$quit_on_error" = YES ]] && set -e
+if [[ -z "$quit_on_error" ]] || [[ "$quit_on_error" = YES ]]; then
+   prompt "Script will stop executing on the first error!"
+   set -e
+fi
 
 # When using -x / --trace option, the script will print each bash command before it is executed
 trap_commands;
@@ -342,6 +372,7 @@ if [[ ! -f $ENV_FILE ]]; then
     echo "Can't find \"overcloudrc\" environment file! Overcloud must be correctly deployed. Exiting."
     exit 1
 else
+  prompt "Switching to Overcloud with \"overcloudrc\". Please note that any previous configuration on Undercloud with \"stackrc\" will be ignored."
     source $ENV_FILE
     openstack endpoint list
 fi
@@ -351,6 +382,7 @@ fi
 # Evaluating user input parameters
 
 # Getting VMs instances operating system image
+# [[ -z "$img_name" ]] && select img_name in rhel74 rhel75 rhel76 rhel8 cirros35; do [ -n "$img_name" ] && break; done
 while ! [[ "$img_name" =~ ^(rhel74|rhel75|rhel76|rhel8|cirros35)$ ]]; do
   echo -e "\nWhich image do you want to use: rhel74 / rhel75 / rhel76 / rhel8 / cirros35 ?"
   read -r img_name
@@ -367,7 +399,7 @@ done
 # Checking if external network exists
 ext_net=$(openstack network list --external -c Name -f value)
 if [[ -z "$ext_net" ]]; then
-  echo -e "\n${RED}Warning: External network does NOT exist!${NO_CLR}"
+  echo -e "\n${RED}Warning: External network does NOT exist on Overcloud!${NO_CLR}"
   if [[ "$external_network_type" =~ ^(skip)$ ]]; then
     # NO external network exists -> setting default network. e.g. "flat - datacentre"
     echo -e "Default external network to be created: $default_network_type - $default_physical_network"
@@ -465,9 +497,13 @@ fi
 
 # Downloading and creating images & flavors (as Admin)
 if [[ $img_name = cirros35 ]]; then
+
+  # cirros download
+  prompt "Downloading CirrOS 0.3.5 Image file"
+  download_file "${cirros35_images_url}" "${CIRROS35_IMG}"
+
   # cirros image
-  prompt "Creating CirrOS 0.3.5 Image"
-  wget -nc ${cirros35_images_url}${CIRROS35_IMG} --no-check-certificate
+  prompt "Creating CirrOS 0.3.5 Image object"
   openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $CIRROS35_IMG
 
   # cirros flavor
@@ -478,28 +514,43 @@ if [[ $img_name = cirros35 ]]; then
 
 else
   if [[ $img_name = rhel74 ]]; then
-    # rhel v7.4 image
-    prompt "Creating RHEL v7.4 Image"
-    wget -N ${rhel_images_url}${RHEL74_IMG}
+    # rhel v7.4 download
+    prompt "Downloading RHEL v7.4 Image file"
+    download_file "${rhel_images_url}" "${RHEL74_IMG}"
+
+    # rhel v7.4  image
+    prompt "Creating RHEL v7.4 Image object"
     openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL74_IMG
+
   else
     if [[ $img_name = rhel75 ]]; then
+      # rhel v7.5 download
+      prompt "Downloading RHEL v7.5 Image file"
+      download_file "${rhel_images_url}" "${RHEL75_IMG}"
+
       # rhel v7.5 image
       prompt "Creating RHEL v7.5 Image"
-      wget -N ${rhel_images_url}${RHEL75_IMG}
       openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL75_IMG
+
     else
       if [[ $img_name = rhel76 ]]; then
-       # rhel v7.6 image
-       prompt "Creating RHEL v7.6 Image"
-       wget -N ${rhel_images_url}${RHEL76_IMG}
-       openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL76_IMG
+        # rhel v7.6 download
+        prompt "Downloading RHEL v7.6 Image file"
+        download_file "${rhel_images_url}" "${RHEL76_IMG}"
+
+        # rhel v7.6 image
+        prompt "Creating RHEL v7.6 Image"
+        openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL76_IMG
+
       else
         if [[ $img_name = rhel8 ]]; then
-           # rhel v8 image
-           prompt "Creating RHEL v8 Image"
-           wget -N ${rhel_images_url}${RHEL80_IMG}
-           openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL80_IMG
+          # rhel v8.0 download
+          prompt "Downloading RHEL v8.0 Image file"
+          download_file "${rhel_images_url}" "${RHEL80_IMG}"
+
+          # rhel v8.0 image
+          prompt "Creating RHEL v8.0 Image"
+          openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL80_IMG
         fi
       fi
     fi
@@ -821,6 +872,6 @@ ssh -i $KEY_FILE ${ssh_user}@SERVER_FIP"
 # sudo yum install -y screen
 # screen -r -d
 #
-# ./create_multi_topology.sh -x -q -i cirros35 -t mvi --no-ipv6 -e skip -n 2 -v 2 -c YES
+# ./create_multi_topology.sh -x -i cirros35 -t mvi --no-ipv6 -e skip -n 2 -v 2 -c YES
 #
 
