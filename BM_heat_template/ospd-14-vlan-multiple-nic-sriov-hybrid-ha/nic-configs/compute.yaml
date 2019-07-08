@@ -189,14 +189,6 @@ resources:
                 - ip_netmask:
                     get_param: StorageIpSubnet
 
-              - type: vlan
-                vlan_id:
-                  get_param: StorageMgmtNetworkVlanID
-                device: em1
-                addresses:
-                - ip_netmask:
-                    get_param: StorageMgmtIpSubnet
-
               - type: ovs_bridge
                 name: br-ext-int
                 use_dhcp: false
