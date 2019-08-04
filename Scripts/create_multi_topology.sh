@@ -6,16 +6,16 @@
 # Script description
 disclosure='----------------------------------------------------------------------
 
-This is an interactive script to create and run:
+This is an interactive script to create and test OpenStack topologies including:
 
-* Multiple VM instances (of type RHEL 8.0 / RHEL 7.6 / RHEL 7.5 / RHEL 7.4 / Cirros)
-* Multiple Networks with IPv4 & IPv6 subnets, and Floating IPs, connected to external network (Flat / Vlan)
-* Tests includes: SSH Keypair, non-admin Tenant, Security group for HTTP/S, North-South, East-West, SNAT.
+* Multiple VM instances of following Operating Systems: RHEL (8.0, 7.6, 7.5, 7.4), Cirros and Windows.
+* Multiple Networks and NICs with IPv4 & IPv6 subnets and Floating IPs, connected to external networks (Flat / Vlan)
+* Tests includes: SSH Keypair, non-admin Tenant, Security group for HTTP/S, North-South, East-West, SNAT, and more.
 
 Running with pre-defined parameters (optional):
 
 * To show this help menu:                               -h / --help
-* To set VM image:                                      -i / --image    [ rhel74 / rhel75 / rhel76 / rhel8 / cirros35 ]
+* To set VM image:                                      -i / --image    [ rhel74 / rhel75 / rhel76 / rhel80 / cirros40 / win2019 ]
 * To set topology - Multiple VMs or multiple NICs:      -t / --topology [ mni = Multiple Networks Interfaces / mvi = Multiple VM Instances ]
 * To set the number of networks:                        -n / --networks [ 1-100 ]
 * To set the number of VMs:                             -v / --machines [ 1-100 ]
@@ -34,23 +34,23 @@ Command examples:
 
   Will run interactively (enter choices during execution).
 
-# ./create_multi_topology.sh -x -t mvi -i cirros35 -n 2 -v 2 -e skip -c YES
+# ./create_multi_topology.sh -x -t mvi -i cirros40 -n 2 -v 2 -e skip -c YES
 
   Will create and test Multiple VMs (4 total).
   On each of the 2 Networks - 2 CirrOS connected:
 
-         <--> CirrOS1            <--> CirrOS3
+         <--> CirrOS_vm1         <--> CirrOS_vm3
   Net1 -|                 Net2 -|
-         <--> CirrOS2            <--> CirrOS4
+         <--> CirrOS_vm2         <--> CirrOS_vm4
 
-# ./create_multi_topology.sh -t mni -i rhel8 -n 2 -v 2 -e skip -c YES
+# ./create_multi_topology.sh -t mni -i rhel80 -n 2 -v 2 -e skip -c YES
 
   Will create and test Multiple NICs (4 total).
   On each of the 2 RHEL8 - 2 NICs connected:
 
-          <--> NIC1               <--> NIC3
-  RHEL8 -|                RHEL8 -|
-          <--> NIC2               <--> NIC4
+             <--> NIC_1                   <--> NIC_3
+  RHEL8_vm1 -|                RHEL8_vm2 -|
+             <--> NIC_2                   <--> NIC_4
 
 ----------------------------------------------------------------------'
 
@@ -64,9 +64,11 @@ log_file=multi_topology_$(date +%d-%m-%Y_%H%M).log
 
 export RED='\e[0;31m'
 export GREEN='\e[38;5;22m'
+export CYAN='\e[36m'
 export YELLOW='\e[1;33m'
-export NO_CLR='\e[0m' # No Color
-export HAT="${RED}🎩︎${NO_CLR}"
+export NO_COLOR='\e[0m'
+export HAT="${RED}🎩︎${NO_COLOR}"
+export PYTHONIOENCODING=utf8
 
 export KEY_FILE=tester_key.pem
 export previous_vm=""
@@ -85,8 +87,12 @@ export RHEL76_IMG='rhel-guest-image-7.6-210_apache_php.qcow2'
 export RHEL80_IMG='rhel-guest-image-8.0-1736_apache_php.qcow2'
 
 # CIRROS Images
-export cirros35_images_url='https://download.cirros-cloud.net/0.3.5/'
-export CIRROS35_IMG='cirros-0.3.5-x86_64-disk.img'
+export cirros40_images_url='http://download.cirros-cloud.net/0.4.0/'
+export CIRROS40_IMG='cirros-0.4.0-x86_64-disk.img'
+
+# Windows Images
+export win_images_url='http://file.tlv.redhat.com/~nmanos/windows-custom-images/'
+export WIN2019_IMG='windows_2019_ssh.qcow2'
 
 ####################################################################################
 
@@ -167,79 +173,137 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 ####################################################################################
 
-# FUNCTIONS
+### FUNCTIONS ###
 
 # Function to print $PS1 and then message
-prompt() {
+function prompt() {
   eval 'echo -e "\n'$PS1'$1\n"' | sed -e 's#\\\[##g' -e 's#\\\]##g';
 }
 
-trap_commands() {
-# When using -x / --trace option, the script will print each bash command before it is executed
+# Function to print each bash command before it is executed
+function trap_commands() {
+  # When using -x / --trace option
   if [[ "$trace_bash" = YES ]]; then
     trap '! [[ "$BASH_COMMAND" =~ ^(echo|read|\[\[|while|for|prompt) ]] && \
-  cmd=`eval echo -e "$BASH_COMMAND" 2>/dev/null` && \
-  echo -e "${GREEN} $cmd ${NO_CLR}"' DEBUG
+  cmd=`eval echo -e "[${PWD##*/}]\$ $BASH_COMMAND" 2>/dev/null` && \
+  echo -e "${CYAN}$cmd${NO_COLOR}"' DEBUG
   fi
 }
 export -f trap_commands
 
-download_file() {
+# Function to download file from URL, if local file doesn't exists, or has a different size on URL
+function download_file() {
   trap_commands;
-  # To download file from URL, if local file doesn't exists, or has a different size on URL
-  FILE_URL=$1
-  FILE_NAME=$2
+  # FILE_DIR => $1
+  # FILE_NAME => $2
+
+  if [[ -z "$2" ]]; then
+    FILE_PATH="$1"
+    FILE_NAME=$(basename "$1")
+  else
+    FILE_PATH="$1/$2"
+    FILE_NAME=$2
+  fi
+
+  echo "Downloading $FILE_NAME from: $FILE_PATH"
   # wget does not always exists on hosts, using curl instead
-  # wget -nc ${FILE_URL}${FILE_NAME} --no-check-certificate
+  # wget -nc ${FILE_PATH} --no-check-certificate
   local_file_size=$([[ -f ${FILE_NAME} ]] && wc -c < ${FILE_NAME} || echo "0")
-  remote_file_size=$(curl -sI ${FILE_URL}${FILE_NAME} | awk '/Content-Length/ { print $2 }' | tr -d '\r' )
+  remote_file_size=$(curl -sI ${FILE_PATH} | awk '/Content-Length/ { print $2 }' | tr -d '\r' )
   if [[ "$local_file_size" -ne "$remote_file_size" ]]; then
-      curl -o ${FILE_NAME} ${FILE_URL}${FILE_NAME}
+      curl -o ${FILE_NAME} ${FILE_PATH}
+  else
+    echo "$FILE_NAME already downloaded, and equals to remote file $FILE_PATH"
   fi
 }
 
-create_floating_ip() {
+function create_floating_ip() {
   trap_commands;
   prompt "Creating new floating ip on external network: $ext_net"
   export fip=$(openstack floating ip create $ext_net -c floating_ip_address -f value)
   #openstack floating ip show "$fip"
 }
 
-test_fip_port_active() {
+function test_new_vm_active() {
+  trap_commands;
+  prompt "Waiting until the new VM \"${vm_name}\" is created and activated"
+
+  vm_id=$(openstack server list -c ID -f value | head -1)
+  CONDITION="openstack server show $vm_id | grep -E 'ACTIVE' -B 5"
+
+  COUNT=0; ATTEMPTS=20
+  until eval $CONDITION || [[ $COUNT -eq $ATTEMPTS ]]; do
+    echo -e "$(( COUNT++ ))... \c"
+    sleep 1
+  done
+  if [[ $COUNT -eq $ATTEMPTS ]]; then
+    prompt "${RED} Limit of $ATTEMPTS attempts has exceeded. ${NO_COLOR}"
+    return 1
+  fi
+  return 0
+}
+
+function test_vm_console_init() {
+  trap_commands;
+  prompt "Getting VNC console URL for $vm_name ($vm_id)"
+  openstack console url show $vm_id
+
+  prompt "Checking for boot errors on $vm_name ($vm_id)"
+  CONDITION="openstack console log show $vm_id | grep \"${vm_name//_/-}\" -C 10"
+
+  COUNT=0; ATTEMPTS=20
+  until eval $CONDITION || [[ $COUNT -eq $ATTEMPTS ]]; do
+    echo -e "$(( COUNT++ ))... \c"
+    sleep 1
+  done
+  if [[ $COUNT -eq $ATTEMPTS ]]; then
+    eval $CONDITION
+    prompt "${RED} Limit of $ATTEMPTS attempts has exceeded. ${NO_COLOR}"
+    return 1
+  fi
+  eval $CONDITION
+  return 0
+}
+
+function test_fip_port_active() {
   trap_commands;
   prompt "Setting a NAME to the new floating ip port: \"${vm_name}_${fip}\""
   openstack $debug port set $port_id --name "${vm_name}_${fip}"
   openstack $debug port show $port_id
 
   prompt "Waiting for floating ip to be ACTIVE on $vm_name, with internal IP address $int_ipv4"
-  until openstack port show $port_id | grep -E 'ACTIVE' -B 14; do sleep 1 ; done
   #until openstack floating ip show "$fip" | grep -E 'ACTIVE' -B 6; do sleep 1 ; done
-}
-
-run_in_ssh() {
-  trap_commands;
-  prompt "Running within SSH $1 : $2"
-  COUNT=0
-  ATTEMPTS=5
-  until ssh -i $KEY_FILE -o StrictHostKeyChecking=no $1 "$2" || [[ $COUNT -eq $ATTEMPTS ]]; do
-    echo -e "$(( COUNT++ )) ... \c"
+  CONDITION="openstack port show $port_id | grep -E 'ACTIVE' -B 14"
+  COUNT=0; ATTEMPTS=20
+  until eval $CONDITION || [[ $COUNT -eq $ATTEMPTS ]]; do
+    echo -e "$(( COUNT++ ))... \c"
     sleep 1
   done
   if [[ $COUNT -eq $ATTEMPTS ]]; then
-    prompt "${RED} SSH command has failed. ${NO_CLR}"
+    prompt "${RED} Limit of $ATTEMPTS attempts has exceeded. ${NO_COLOR}"
     return 1
   fi
   return 0
 }
 
-test_connectivity() {
+function run_in_ssh() {
   trap_commands;
-  prompt "Getting VNC console URL for $vm_name ($vm_id)"
-  openstack console url show $vm_id
+  prompt "Running within SSH $1 : $2"
+  COUNT=0
+  ATTEMPTS=5
+  until ssh -i $KEY_FILE -o StrictHostKeyChecking=no $1 "$2" || [[ $COUNT -eq $ATTEMPTS ]]; do
+    echo -e "$(( COUNT++ ))... \c"
+    sleep 1
+  done
+  if [[ $COUNT -eq $ATTEMPTS ]]; then
+    prompt "${RED} SSH command has failed. ${NO_COLOR}"
+    return 1
+  fi
+  return 0
+}
 
-  prompt "Checking for boot errors on $vm_name ($vm_id)"
-  openstack console log show $vm_name | tail -n 100 | grep -i network || echo "$vm_name booted OK"
-
+function test_connectivity() {
+  trap_commands;
   prompt "Pinging the new FIP ${fip} of ${vm_name} from Undercloud (North-South test)"
   # until ping -c1 $fip ; do sleep 1 ; done
   ping -w 30 -c 5 ${fip:-NO_FIP}
@@ -272,7 +336,7 @@ test_connectivity() {
   export previous_ipv6=$int_ipv6
 }
 
-run_cleanup() {
+function run_cleanup() {
   trap_commands;
   prompt "Deleting all VM instances"
   for vm in $(openstack server list --all -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack server delete $vm; done
@@ -328,6 +392,8 @@ run_cleanup() {
 
 ####################################################################################
 
+### MAIN ###
+
 # Evaluating general script options
 
 # When using -q / --quit option, the script will stop executing on first error
@@ -382,9 +448,9 @@ fi
 # Evaluating user input parameters
 
 # Getting VMs instances operating system image
-# [[ -z "$img_name" ]] && select img_name in rhel74 rhel75 rhel76 rhel8 cirros35; do [ -n "$img_name" ] && break; done
-while ! [[ "$img_name" =~ ^(rhel74|rhel75|rhel76|rhel8|cirros35)$ ]]; do
-  echo -e "\nWhich image do you want to use: rhel74 / rhel75 / rhel76 / rhel8 / cirros35 ?"
+# [[ -z "$img_name" ]] && select img_name in rhel74 rhel75 rhel76 rhel80 cirros40 win2019; do [ -n "$img_name" ] && break; done
+while ! [[ "$img_name" =~ ^(rhel74|rhel75|rhel76|rhel80|cirros40|win2019)$ ]]; do
+  echo -e "\nWhich image do you want to use: rhel74 / rhel75 / rhel76 / rhel80 / cirros40 / win2019 ?"
   read -r img_name
 done
 
@@ -399,13 +465,13 @@ done
 # Checking if external network exists
 ext_net=$(openstack network list --external -c Name -f value)
 if [[ -z "$ext_net" ]]; then
-  echo -e "\n${RED}Warning: External network does NOT exist on Overcloud!${NO_CLR}"
+  echo -e "\n${RED}Warning: External network does NOT exist on Overcloud!${NO_COLOR}"
   if [[ "$external_network_type" =~ ^(skip)$ ]]; then
     # NO external network exists -> setting default network. e.g. "flat - datacentre"
     echo -e "Default external network to be created: $default_network_type - $default_physical_network"
   fi
 else
-  echo -e "\n${YELLOW}External network exists:${NO_CLR} $ext_net"
+  echo -e "\n${YELLOW}External network exists:${NO_COLOR} $ext_net"
   openstack network show $ext_net > EXT_NET.out
   cat EXT_NET.out
   if [[ "$external_network_type" =~ ^(skip)$ ]]; then
@@ -472,8 +538,8 @@ done
 # Getting number of VM instances to create
 while ! [[ "$inst_num" =~ ^([0-9]+)$ && "$inst_num" -le "100" && "$inst_num" -gt "0" ]]; do
   echo -e "\nHow many VM instances do you want to create (1-100) ?
-${YELLOW}NOTICE:${NO_CLR} In a multiple VMs topology (mvi)- it's the number of instances per network!
-The total number of instances will be ${YELLOW}N X $net_num ${NO_CLR}"
+${YELLOW}NOTICE:${NO_COLOR} In a multiple VMs topology (mvi)- it's the number of instances per network!
+The total number of instances will be ${YELLOW}N X $net_num ${NO_COLOR}"
   read -r inst_num
 done
 
@@ -482,7 +548,7 @@ done
 
 # Running CLEANUP if required (cleanup_needed = YES)
 if ! [[ "$cleanup_needed" =~ ^(NO|YES|ONLY)$ ]]; then
-  echo -e "\n${YELLOW}NOTICE: Before starting, do you want to remove ALL exiting VMs and Networks ? ${NO_CLR}
+  echo -e "\n${YELLOW}NOTICE: Before starting, do you want to remove ALL exiting VMs and Networks ? ${NO_COLOR}
 Enter in upper-case \"YES\", or press enter to skip cleanup: "
   read -r cleanup_needed
   cleanup_needed=${cleanup_needed:-NO}
@@ -496,70 +562,90 @@ fi
 ####################################################################################
 
 # Downloading and creating images & flavors (as Admin)
-if [[ $img_name = cirros35 ]]; then
 
-  # cirros download
-  prompt "Downloading CirrOS 0.3.5 Image file"
-  download_file "${cirros35_images_url}" "${CIRROS35_IMG}"
+# Windows Images
+if [[ $img_name = win2019 ]]; then
+  # windows 2019 download
+  prompt "Downloading Windows 2019 Image file - Recommended for Baremetal compute nodes only!"
+  download_file "${win_images_url}" "${WIN2019_IMG}"
 
-  # cirros image
-  prompt "Creating CirrOS 0.3.5 Image object"
-  openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $CIRROS35_IMG
+  # windows 2019 image
+  prompt "Creating Windows 2019 Glance Image - Recommended for Baremetal compute nodes only!"
+  openstack image show $img_name || openstack -v $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $WIN2019_IMG
 
-  # cirros flavor
-  prompt "Creating CirrOS Flavor"
-  flavor=cirros_flavor
-  openstack flavor show $flavor || openstack $debug flavor create --public $flavor --id auto --ram 512 --disk 1 --vcpus 1
-  ssh_user=cirros
+  # windows 2019 flavor
+  prompt "Creating Windows Flavor - Recommended for Baremetal compute nodes only!"
+  flavor=windows_flavor_1ram_1vpu_25disk
+  openstack flavor show $flavor || openstack $debug flavor create --public $flavor --id auto --ram 1024 --disk 25 --vcpus 1
+  ssh_user=Administrator
 
 else
-  if [[ $img_name = rhel74 ]]; then
-    # rhel v7.4 download
-    prompt "Downloading RHEL v7.4 Image file"
-    download_file "${rhel_images_url}" "${RHEL74_IMG}"
+  # CirrOS Images
+  if [[ $img_name = cirros40 ]]; then
+    # cirros download
+    prompt "Downloading CirrOS 4.0.0 Image file"
+    download_file "${cirros40_images_url}" "${CIRROS40_IMG}"
 
-    # rhel v7.4  image
-    prompt "Creating RHEL v7.4 Image object"
-    openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL74_IMG
+    # cirros image
+    prompt "Creating CirrOS 4.0.0 Glance Image"
+    openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $CIRROS40_IMG
+
+    # cirros flavor
+    prompt "Creating CirrOS Flavor"
+    flavor=cirros_flavor_0.5ram_1vpu_1disk
+    openstack flavor show $flavor || openstack $debug flavor create --public $flavor --id auto --ram 512 --disk 1 --vcpus 1
+    ssh_user=cirros
 
   else
-    if [[ $img_name = rhel75 ]]; then
-      # rhel v7.5 download
-      prompt "Downloading RHEL v7.5 Image file"
-      download_file "${rhel_images_url}" "${RHEL75_IMG}"
+    # RHEL Images
+    if [[ $img_name = rhel74 ]]; then
+      # rhel v7.4 download
+      prompt "Downloading RHEL v7.4 Image file"
+      download_file "${rhel_images_url}" "${RHEL74_IMG}"
 
-      # rhel v7.5 image
-      prompt "Creating RHEL v7.5 Image"
-      openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL75_IMG
+      # rhel v7.4 image
+      prompt "Creating RHEL v7.4 Glance Image"
+      openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL74_IMG
 
     else
-      if [[ $img_name = rhel76 ]]; then
-        # rhel v7.6 download
-        prompt "Downloading RHEL v7.6 Image file"
-        download_file "${rhel_images_url}" "${RHEL76_IMG}"
+      if [[ $img_name = rhel75 ]]; then
+        # rhel v7.5 download
+        prompt "Downloading RHEL v7.5 Image file"
+        download_file "${rhel_images_url}" "${RHEL75_IMG}"
 
-        # rhel v7.6 image
-        prompt "Creating RHEL v7.6 Image"
-        openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL76_IMG
+        # rhel v7.5 image
+        prompt "Creating RHEL v7.5 Glance Image"
+        openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL75_IMG
 
       else
-        if [[ $img_name = rhel8 ]]; then
-          # rhel v8.0 download
-          prompt "Downloading RHEL v8.0 Image file"
-          download_file "${rhel_images_url}" "${RHEL80_IMG}"
+        if [[ $img_name = rhel76 ]]; then
+          # rhel v7.6 download
+          prompt "Downloading RHEL v7.6 Image file"
+          download_file "${rhel_images_url}" "${RHEL76_IMG}"
 
-          # rhel v8.0 image
-          prompt "Creating RHEL v8.0 Image"
-          openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL80_IMG
+          # rhel v7.6 image
+          prompt "Creating RHEL v7.6 Glance Image"
+          openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL76_IMG
+
+        else
+          if [[ $img_name = rhel80 ]]; then
+            # rhel v8.0 download
+            prompt "Downloading RHEL v8.0 Image file"
+            download_file "${rhel_images_url}" "${RHEL80_IMG}"
+
+            # rhel v8.0 image
+            prompt "Creating RHEL v8.0 Glance Image"
+            openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $RHEL80_IMG
+          fi
         fi
       fi
     fi
+    # rhel flavor
+    prompt "Creating RHEL Flavor"
+    flavor=rhel_flavor_1ram_1vpu_10disk
+    openstack flavor show $flavor || openstack $debug flavor create --public $flavor --id auto --ram 1024 --disk 10 --vcpus 1
+    ssh_user=cloud-user
   fi
-  # rhel flavor
-  prompt "Creating RHEL Flavor"
-  flavor=rhel_flavor
-  openstack flavor show $flavor || openstack $debug flavor create --public $flavor --id auto --ram 1024 --disk 10 --vcpus 1
-  ssh_user=cloud-user
 fi
 
 ####################################################################################
@@ -581,7 +667,7 @@ fi
 ext_net=$(openstack network list --external -c Name -f value)
 
 if [[ -z "$ext_net" ]]; then
-  echo -e "\n${PS1}Error: ${RED}External network was not created, exiting!${NO_CLR}"
+  echo -e "\n${PS1}Error: ${RED}External network was not created, exiting!${NO_COLOR}"
   exit 1
 fi
 
@@ -742,7 +828,7 @@ if  [[ $topology = mni ]];  then
   prompt "Creating $inst_num VM instances:"
   for i in `seq 1 $inst_num`; do
      img_id=$(openstack image list | grep $img_name | head -1 | cut -d " " -f 2)
-     vm_name=${img_name}_vm${i}
+     vm_name="${img_name}-vm${i}"
 
      nics=""
      for n in `seq 1 $net_num`; do
@@ -758,8 +844,8 @@ if  [[ $topology = mni ]];  then
      #vm_id=$(cat _temp.out | awk -F'[ \t]*\\|[ \t]*' '/ id / {print $3}')
 
      openstack $debug server create --flavor $flavor --image $img_id $nics --security-group $sec_id --key-name tester-key $vm_name
-     vm_id=$(openstack server list -c ID -f value | head -1)
-     until openstack server show $vm_id | grep -E 'ACTIVE' -B 5; do sleep 1 ; done
+
+     test_new_vm_active;
 
      ip_addresses=$(openstack server show $vm_id -c addresses -f value)
      [[ $ipv6_enable = YES ]] && export int_ipv6=$(echo $ip_addresses | grep -Po '[\w:]+:+[\w:]+')
@@ -784,6 +870,8 @@ if  [[ $topology = mni ]];  then
 
        test_fip_port_active;
 
+       test_vm_console_init;
+
        test_connectivity;
      done
   done
@@ -802,14 +890,13 @@ if  [[ $topology = mvi ]];  then
       create_floating_ip;
 
       img_id=$(openstack image list | grep $img_name | head -1 | cut -d " " -f 2)
-      vm_name=${img_name}_vm${i}_net${n}
+      vm_name="${img_name}-vm${i}-net${n}"
 
       prompt "Creating and booting VM instance: ${vm_name}, connected to network int_net_${n}:"
 
       openstack $debug server create --flavor $flavor --image $img_id --nic net-id=int_net_$n --security-group $sec_id --key-name tester-key $vm_name
 
-      vm_id=$(openstack server list -c ID -f value | head -1)
-      until openstack server show $vm_id | grep -E 'ACTIVE' -B 5; do sleep 1 ; done
+      test_new_vm_active;
 
       prompt "Adding the floating ip $fip to $vm_name"
       #openstack $debug server add floating ip $vm_name $fip --fixed-ip-address
@@ -829,6 +916,8 @@ if  [[ $topology = mvi ]];  then
       prompt "The floating ip $fip is set to Port: $port_id (of the the internal IP $int_ipv4 on VM $vm_name)"
 
       test_fip_port_active;
+
+      test_vm_console_init;
 
       test_connectivity;
     done
@@ -861,6 +950,9 @@ ssh -i $KEY_FILE ${ssh_user}@SERVER_FIP"
 #
 # Credentials for CirrOS VMs: cirros / cubswin:)
 # ssh -i tester_key.pem cirros@SERVER_FIP
+#
+# Credentials for Windows 2019 VMs: Administrator / Aa123456
+# ssh -i tester_key.pem administrator@SERVER_FIP
 
 # You can find latest script here:
 # https://code.engineering.redhat.com/gerrit/gitweb?p=Neutron-QE.git;a=blob;f=Scripts/create_multi_topology.sh
@@ -872,6 +964,10 @@ ssh -i $KEY_FILE ${ssh_user}@SERVER_FIP"
 # sudo yum install -y screen
 # screen -r -d
 #
-# ./create_multi_topology.sh -x -i cirros35 -t mvi --no-ipv6 -e skip -n 2 -v 2 -c YES
+# CirrOS VMs (2 instances) example:
+# ./create_multi_topology.sh -x -i cirros40 -t mvi --no-ipv6 -e skip -n 2 -v 2 -c YES
+#
+# Windows VM (1 instance) example - Recommended for Baremetal compute nodes only:
+# ./create_multi_topology.sh -x -i win2019 -t mvi --no-ipv6 -e skip -n 1 -v 1 -c YES
 #
 
