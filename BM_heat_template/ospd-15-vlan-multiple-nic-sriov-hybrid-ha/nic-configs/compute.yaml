@@ -1,5 +1,5 @@
 heat_template_version: rocky
-
+#em1=eth0
 description: >
   Software Config to drive os-net-config to configure VLANs for the
   compute role.
@@ -136,6 +136,36 @@ parameters:
     description: The IP address of the EC2 metadata server. (The parameter
       is automatically resolved from the ctlplane subnet's host_routes attribute.)
     type: string
+  ControlPlaneStaticRoutes:
+    default: []
+    description: >
+       Routes for the ctlplane network traffic. JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}] Unless
+       the default is changed, the parameter is automatically resolved from the subnet host_routes attribute.
+    type: json
+  ControlPlaneMtu:
+    default: 1500
+    description: >-
+      The maximum transmission unit (MTU) size(in bytes) that is guaranteed to pass through the data path of the segments
+      in the network. (The parameter is automatically resolved from the ctlplane network's mtu attribute.)
+    type: number
+  StorageMtu:
+    default: 1500
+    description: >-
+      The maximum transmission unit (MTU) size(in bytes) that is guaranteed to pass through the data path of the segments
+      in the Storage network.
+    type: number
+  InternalApiMtu:
+    default: 1500
+    description: >-
+      The maximum transmission unit (MTU) size(in bytes) that is guaranteed to pass through the data path of the segments
+      in the InternalApi network.
+    type: number
+  TenantMtu:
+    default: 1500
+    description: >-
+      The maximum transmission unit (MTU) size(in bytes) that is guaranteed to pass through the data path of the segments
+      in the Tenant network.
+    type: number
 
 resources:
   OsNetConfigImpl:
@@ -168,7 +198,7 @@ resources:
               - type: vlan
                 vlan_id:
                   get_param: InternalApiNetworkVlanID
-                device: em1
+                device: eth0
                 addresses:
                 - ip_netmask:
                     get_param: InternalApiIpSubnet
@@ -176,7 +206,7 @@ resources:
               - type: vlan
                 vlan_id:
                   get_param: TenantNetworkVlanID
-                device: em1
+                device: eth0
                 addresses:
                 - ip_netmask:
                     get_param: TenantIpSubnet
@@ -184,7 +214,7 @@ resources:
               - type: vlan
                 vlan_id:
                   get_param: StorageNetworkVlanID
-                device: em1
+                device: eth0
                 addresses:
                 - ip_netmask:
                     get_param: StorageIpSubnet
