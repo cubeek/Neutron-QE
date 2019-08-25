@@ -1,0 +1,60 @@
+resource_registry:
+  # Specify the relative/absolute path to the config files you want to use for override the default.
+  OS::TripleO::Compute::Net::SoftwareConfig: nic-configs/compute.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
+
+parameter_defaults:
+  # Use an External allocation pool which will leave room for floating IPs
+  ExternalAllocationPools: [{'start': '10.35.166.41', 'end': '10.35.166.60'}]
+  ExternalNetCidr: 10.35.166.0/24
+  # Set to the router gateway on the external network
+  ExternalInterfaceDefaultRoute: 10.35.166.254
+  ExternalNetworkVlanID: 181
+
+  # Gateway router for the provisioning network (or Undercloud IP)
+  ControlPlaneDefaultRoute: 192.168.24.1
+  # Generally the IP of the Undercloud
+  EC2MetadataIp: 192.168.24.1
+
+
+  # CIDR subnet mask length for provisioning network
+  InternalApiAllocationPools:
+  -   end: fd00:fd00:fd00:2000:aaaa:aaaa:ffff:fffe
+      start: fd00:fd00:fd00:2000::10
+  InternalApiNetCidr: fd00:fd00:fd00:2000::/64
+
+  StorageAllocationPools:
+  -   end: fd00:fd00:fd00:3000:aaaa:aaaa:ffff:fffe
+      start: fd00:fd00:fd00:3000::10
+  StorageMgmtAllocationPools:
+  -   end: fd00:fd00:fd00:4000:aaaa:aaaa:ffff:fffe
+      start: fd00:fd00:fd00:4000::10
+  StorageMgmtNetCidr: fd00:fd00:fd00:4000::/64
+  StorageNetCidr: fd00:fd00:fd00:3000::/64
+  TenantAllocationPools:
+  -   end: fd00:fd00:fd00:5000:aaaa:aaaa:ffff:fffe
+      start: fd00:fd00:fd00:5000::10
+  TenantNetCidr: fd00:fd00:fd00:5000::/64
+  TenantNetworkVlanID: 221
+  NeutronOverlayIPVersion: 6
+
+  DnsServers: ["10.46.0.31","10.46.0.32"]
+  NeutronExternalNetworkBridge: "''"
+  NeutronNetworkType: 'vxlan,vlan,flat'
+  NeutronTunnelTypes: 'vxlan'
+  NeutronBridgeMappings: 'datacentre:br-ext,tenant:br-data'
+  NeutronNetworkVLANRanges: 'datacentre:181:181'
+  #datacentre:225:229
+  OvercloudControlFlavor: controller
+  OvercloudComputeSriovFlavor: compute
+  # Number of nodes to deploy.
+  ControllerCount: 3
+  ComputeCount: 2
+  NtpServer: clock.redhat.com
+
+###EXTRA###
+
+  ControllerHostnameFormat: 'controller-%index%'
+  ComputeHostnameFormat: 'compute-%index%'
+  NeutronMechanismDrivers: "openvswitch"
+  Debug: True
