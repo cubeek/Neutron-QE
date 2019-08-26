@@ -68,6 +68,6 @@ parameter_defaults:
   ComputeSriovParameters:
     KernelArgs: "biosdevname=1 default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
     #KernelArgs: "iommu=pt intel_iommu=on
-  TunedProfileName: "cpu-partitioning"
-  IsolCpusList: "2-23"
-  NovaReservedHostMemory: 4096
+    TunedProfileName: "cpu-partitioning"
+    IsolCpusList: "2-23"
+    NovaReservedHostMemory: 4096
