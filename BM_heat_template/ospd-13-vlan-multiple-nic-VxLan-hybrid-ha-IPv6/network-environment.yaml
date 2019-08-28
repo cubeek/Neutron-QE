@@ -5,11 +5,10 @@ resource_registry:
 
 parameter_defaults:
   # Use an External allocation pool which will leave room for floating IPs
-  ExternalAllocationPools: [{'start': '10.35.166.41', 'end': '10.35.166.60'}]
-  ExternalNetCidr: 10.35.166.0/24
-  # Set to the router gateway on the external network
-  ExternalInterfaceDefaultRoute: 10.35.166.254
-  ExternalNetworkVlanID: 181
+  ExternalAllocationPools: [{'start': '10.46.21.193', 'end': '10.46.21.212'}]
+  ExternalInterfaceDefaultRoute: 10.46.21.254
+  ExternalNetCidr: 10.46.21.192/26
+  ExternalNetworkVlanID: 319
 
   # Gateway router for the provisioning network (or Undercloud IP)
   ControlPlaneDefaultRoute: 192.168.24.1
@@ -35,7 +34,7 @@ parameter_defaults:
   -   end: fd00:fd00:fd00:5000:aaaa:aaaa:ffff:fffe
       start: fd00:fd00:fd00:5000::10
   TenantNetCidr: fd00:fd00:fd00:5000::/64
-  TenantNetworkVlanID: 221
+  TenantNetworkVlanID: 231
   NeutronOverlayIPVersion: 6
 
   DnsServers: ["10.46.0.31","10.46.0.32"]
