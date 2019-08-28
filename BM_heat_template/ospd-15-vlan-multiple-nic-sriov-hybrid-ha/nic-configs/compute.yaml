@@ -180,7 +180,7 @@ resources:
             $network_config:
               network_config:
               - type: interface
-                name: em1
+                name: eth0
                 addresses:
                 - ip_netmask:
                     list_join:
