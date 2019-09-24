@@ -2,7 +2,7 @@ resource_registry:
   # Specify the relative/absolute path to the config files you want to use for override the default.
   OS::TripleO::ComputeSriov::Net::SoftwareConfig: nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
-  OS::TripleO::Services::NeutronDhcpAgent: /usr/share/openstack-tripleo-heat-templates/docker/services/neutron-dhcp.yaml
+  OS::TripleO::Services::NeutronDhcpAgent: /usr/share/openstack-tripleo-heat-templates/deployment/neutron/neutron-dhcp-container-puppet.yaml
 parameter_defaults:
   # Customize all these values to match the local environment
   InternalApiNetCidr: 10.20.1.0/24
@@ -61,11 +61,11 @@ parameter_defaults:
       physical_network: "datacentre"
   NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
   NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','RamFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
-  NeutronSupportedPCIVendorDevs: ['8086:1572']
+  NeutronSupportedPCIVendorDevs: ['8086:1572', '8086:154d', '8086:10ed']
   NeutronPhysicalDevMappings: "datacentre:p5p4"
   NeutronSriovNumVFs: "p5p4:5"
   ComputeSriovParameters:
     KernelArgs: "biosdevname=1 default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
     TunedProfileName: "cpu-partitioning"
-    IsolCpusList: "22-39"
+    IsolCpusList: "2-23"
     NovaReservedHostMemory: 4096

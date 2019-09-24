@@ -105,6 +105,14 @@ parameters:
     default: 23
     description: Vlan ID for the management network traffic.
     type: number
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage mgmt network
+    type: string
   ExternalInterfaceDefaultRoute:
     default: ''
     description: default route for the external network
@@ -132,6 +140,36 @@ parameters:
     description: The IP address of the EC2 metadata server. (The parameter
       is automatically resolved from the ctlplane subnet's host_routes attribute.)
     type: string
+  ControlPlaneStaticRoutes:
+    default: []
+    description: >
+       Routes for the ctlplane network traffic. JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}] Unless
+       the default is changed, the parameter is automatically resolved from the subnet host_routes attribute.
+    type: json
+  ControlPlaneMtu:
+    default: 1500
+    description: >-
+      The maximum transmission unit (MTU) size(in bytes) that is guaranteed to pass through the data path of the segments
+      in the network. (The parameter is automatically resolved from the ctlplane network's mtu attribute.)
+    type: number
+  StorageMtu:
+    default: 1500
+    description: >-
+      The maximum transmission unit (MTU) size(in bytes) that is guaranteed to pass through the data path of the segments
+      in the Storage network.
+    type: number
+  InternalApiMtu:
+    default: 1500
+    description: >-
+      The maximum transmission unit (MTU) size(in bytes) that is guaranteed to pass through the data path of the segments
+      in the InternalApi network.
+    type: number
+  TenantMtu:
+    default: 1500
+    description: >-
+      The maximum transmission unit (MTU) size(in bytes) that is guaranteed to pass through the data path of the segments
+      in the Tenant network.
+    type: number
 
 resources:
   OsNetConfigImpl:
@@ -145,7 +183,6 @@ resources:
           params:
             $network_config:
               network_config:
-
               - type: interface
                 name: eth9
                 addresses:
