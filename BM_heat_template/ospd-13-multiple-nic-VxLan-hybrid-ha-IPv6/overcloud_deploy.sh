@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-THT_PATH='/home/stack/ospd-13-vlan-multiple-nic-VxLan-hybrid-ha-IPv6'
+THT_PATH='/home/stack/ospd-13-multiple-nic-VxLan-hybrid-ha-IPv6'
 
 if [[ ! -f "$THT_PATH/roles_data.yaml" ]]; then
   openstack overcloud roles generate -o $THT_PATH/roles_data.yaml Controller Compute
