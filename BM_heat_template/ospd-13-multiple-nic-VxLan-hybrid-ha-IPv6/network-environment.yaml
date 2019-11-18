@@ -5,16 +5,19 @@ resource_registry:
 
 parameter_defaults:
   # Use an External allocation pool which will leave room for floating IPs
-  ExternalAllocationPools: [{'start': '10.46.21.193', 'end': '10.46.21.212'}]
-  ExternalInterfaceDefaultRoute: 10.46.21.254
-  ExternalNetCidr: 10.46.21.192/26
+  # ExternalAllocationPools: [{'start': '10.46.21.193', 'end': '10.46.21.212'}]
+  # ExternalInterfaceDefaultRoute: 10.46.21.254
+  # ExternalNetCidr: 10.46.21.192/26
   ExternalNetworkVlanID: 319
-
+  ExternalAllocationPools:
+  -   end: 2620:52:0:2e04:ff:fe3e:aa
+      start: 2620:52:0:2e04:ff:fe3e:1
+  ExternalInterfaceDefaultRoute: 2620:52:0:2e04::fe
+  ExternalNetCidr: 2620:52:0:2e04::/64
   # Gateway router for the provisioning network (or Undercloud IP)
   ControlPlaneDefaultRoute: 192.168.24.1
   # Generally the IP of the Undercloud
   EC2MetadataIp: 192.168.24.1
-
 
   # CIDR subnet mask length for provisioning network
   InternalApiAllocationPools:
