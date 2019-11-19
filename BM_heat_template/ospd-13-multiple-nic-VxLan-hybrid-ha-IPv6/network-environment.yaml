@@ -12,6 +12,13 @@ parameter_defaults:
   ExternalAllocationPools:
   -   end: 2620:52:0:2e04:ff:fe3e:aa
       start: 2620:52:0:2e04:ff:fe3e:1
+  #ExternalAllocationPools: [{'start': '10.46.21.193', 'end': '10.46.21.212'}]
+  #ExternalInterfaceDefaultRoute: 10.46.21.254
+  #ExternalNetCidr: 10.46.21.192/26
+  ExternalNetworkVlanID: 319
+  ExternalAllocationPools:
+  -   end: 2620:52:0:2e04::fd
+      start: 2620:52:0:2e04::1
   ExternalInterfaceDefaultRoute: 2620:52:0:2e04::fe
   ExternalNetCidr: 2620:52:0:2e04::/64
   # Gateway router for the provisioning network (or Undercloud IP)
@@ -39,7 +46,7 @@ parameter_defaults:
   TenantNetCidr: fd00:fd00:fd00:5000::/64
   TenantNetworkVlanID: 231
   NeutronOverlayIPVersion: 6
-
+  InternalApiNetworkVlanID: 230
   DnsServers: ["10.46.0.31","10.46.0.32"]
   NeutronExternalNetworkBridge: "''"
   NeutronNetworkType: 'vxlan,vlan,flat'

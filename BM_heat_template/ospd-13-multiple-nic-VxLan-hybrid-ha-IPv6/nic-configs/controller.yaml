@@ -156,6 +156,7 @@ resources:
                 addresses:
                 - ip_netmask:
                     get_param: TenantIpSubnet
+
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.

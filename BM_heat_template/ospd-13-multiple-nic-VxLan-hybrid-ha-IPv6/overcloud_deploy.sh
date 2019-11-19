@@ -10,7 +10,7 @@ fi
 openstack overcloud deploy  \
 --templates \
 --timeout 120 \
--e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation-v6.yaml \
+-e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation-v6-all.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
