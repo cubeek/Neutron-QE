@@ -5,13 +5,6 @@ resource_registry:
 
 parameter_defaults:
   # Use an External allocation pool which will leave room for floating IPs
-  # ExternalAllocationPools: [{'start': '10.46.21.193', 'end': '10.46.21.212'}]
-  # ExternalInterfaceDefaultRoute: 10.46.21.254
-  # ExternalNetCidr: 10.46.21.192/26
-  ExternalNetworkVlanID: 319
-  ExternalAllocationPools:
-  -   end: 2620:52:0:2e04:ff:fe3e:aa
-      start: 2620:52:0:2e04:ff:fe3e:1
   #ExternalAllocationPools: [{'start': '10.46.21.193', 'end': '10.46.21.212'}]
   #ExternalInterfaceDefaultRoute: 10.46.21.254
   #ExternalNetCidr: 10.46.21.192/26
@@ -44,7 +37,12 @@ parameter_defaults:
   -   end: fd00:fd00:fd00:5000:aaaa:aaaa:ffff:fffe
       start: fd00:fd00:fd00:5000::10
   TenantNetCidr: fd00:fd00:fd00:5000::/64
+
+  InternalApiNetworkVlanID: 230
   TenantNetworkVlanID: 231
+  StorageNetworkVlanID: 232
+  StorageMgmtNetworkVlanID: 233
+
   NeutronOverlayIPVersion: 6
   InternalApiNetworkVlanID: 230
   DnsServers: ["10.46.0.31","10.46.0.32"]
