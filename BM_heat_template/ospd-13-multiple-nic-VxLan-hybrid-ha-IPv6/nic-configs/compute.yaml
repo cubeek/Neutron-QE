@@ -138,7 +138,7 @@ resources:
               - type: ovs_bridge
                 name: br-data
                 use_dhcp: false
-                device: p1p1
+                device: p1p4
 
 outputs:
   OS::stack_id:
