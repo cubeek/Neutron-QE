@@ -10,10 +10,10 @@ parameter_defaults:
   #ExternalNetCidr: 10.46.21.192/26
   ExternalNetworkVlanID: 319
   ExternalAllocationPools:
-  -   end: 2620:52:0:2e04::fd
-      start: 2620:52:0:2e04::1
-  ExternalInterfaceDefaultRoute: 2620:52:0:2e04::fe
-  ExternalNetCidr: 2620:52:0:2e04::/64
+  -   end: 2620:52:0:13b8::fd
+      start: 2620:52:0:13b8::1
+  ExternalInterfaceDefaultRoute: 2620:52:0:13b8::fe
+  ExternalNetCidr: 2620:52:0:13b8::/64
   # Gateway router for the provisioning network (or Undercloud IP)
   ControlPlaneDefaultRoute: 192.168.24.1
   # Generally the IP of the Undercloud
