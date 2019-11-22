@@ -145,24 +145,22 @@ resources:
                 use_dhcp: false
                 dns_servers:
                   get_param: DnsServers
+                addresses:
+                - ip_netmask:
+                    get_param: ExternalIpSubnet
+                routes:
+                - default: true
+                  next_hop:
+                    get_param: ExternalInterfaceDefaultRoute
                 members:
                   - type: interface
-                    name: nic2
+                    name: nic3
                     primary: true
-
-                  - type: vlan
-                    addresses:
-                    - ip_netmask:
-                        get_param: ExternalIpSubnet
-                    routes:
-                    - default: true
-                      next_hop:
-                        get_param: ExternalInterfaceDefaultRoute
 
               - type: ovs_bridge
                 name: br-data
                 use_dhcp: false
-                device: nic3
+                device: nic2
 
 outputs:
   OS::stack_id:
