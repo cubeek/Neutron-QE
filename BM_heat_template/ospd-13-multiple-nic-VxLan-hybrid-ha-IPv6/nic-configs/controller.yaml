@@ -154,7 +154,7 @@ resources:
                     get_param: ExternalInterfaceDefaultRoute
                 members:
                   - type: interface
-                    name: nic3
+                    name: nic4
                     primary: true
 
               - type: ovs_bridge
