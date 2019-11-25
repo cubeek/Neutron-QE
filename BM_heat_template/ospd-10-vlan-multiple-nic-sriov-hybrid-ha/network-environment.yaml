@@ -77,7 +77,7 @@ parameter_defaults:
 #### Extras ####
   ControllerHostnameFormat: 'controller-%index%'
   ComputeSriovHostnameFormat: 'computesriov-%index%'
-  NeutronMechanismDrivers: "openvswitch,sriovnicswitch"
+  NeutronMechanismDrivers: ['sriovnicswitch', 'openvswitch']
   NovaPCIPassthrough:
     - devname: "p1p1"
       physical_network: "datacentre"
