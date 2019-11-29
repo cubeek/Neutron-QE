@@ -16,5 +16,7 @@ openstack overcloud deploy  \
 -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
 -e $THT_PATH/docker-images.yaml \
 -e $THT_PATH/network-environment.yaml \
+-e $THT_PATH/nova-resize-on-the-same-host.yaml \
+-e $THT_PATH/l3_fip_qos.yaml \
 -r $THT_PATH/roles_data.yaml \
 --log-file overcloud_install.log &> overcloud_install.log
