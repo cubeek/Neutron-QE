@@ -1,0 +1,67 @@
+resource_registry:
+  # Specify the relative/absolute path to the config files you want to use for override the default.
+  OS::TripleO::Compute::Net::SoftwareConfig: nic-configs/compute.yaml
+  OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
+
+parameter_defaults:
+  # Use an External allocation pool which will leave room for floating IPs
+  #ExternalAllocationPools: [{'start': '10.46.21.193', 'end': '10.46.21.212'}]
+  #ExternalInterfaceDefaultRoute: 10.46.21.254
+  #ExternalNetCidr: 10.46.21.192/26
+  ExternalNetworkVlanID: 319
+  ExternalAllocationPools:
+  -   end: 2620:52:0:13b8::fd
+      start: 2620:52:0:13b8::1
+  ExternalInterfaceDefaultRoute: 2620:52:0:13b8::fe
+  ExternalNetCidr: 2620:52:0:13b8::/64
+  # Gateway router for the provisioning network (or Undercloud IP)
+  ControlPlaneDefaultRoute: 192.168.24.1
+  # Generally the IP of the Undercloud
+  EC2MetadataIp: 192.168.24.1
+
+  # CIDR subnet mask length for provisioning network
+  InternalApiAllocationPools:
+  -   end: fd00:fd00:fd00:2000:aaaa:aaaa:ffff:fffe
+      start: fd00:fd00:fd00:2000::10
+  InternalApiNetCidr: fd00:fd00:fd00:2000::/64
+
+  StorageAllocationPools:
+  -   end: fd00:fd00:fd00:3000:aaaa:aaaa:ffff:fffe
+      start: fd00:fd00:fd00:3000::10
+  StorageMgmtAllocationPools:
+  -   end: fd00:fd00:fd00:4000:aaaa:aaaa:ffff:fffe
+      start: fd00:fd00:fd00:4000::10
+  StorageMgmtNetCidr: fd00:fd00:fd00:4000::/64
+  StorageNetCidr: fd00:fd00:fd00:3000::/64
+  TenantAllocationPools:
+  -   end: fd00:fd00:fd00:5000:aaaa:aaaa:ffff:fffe
+      start: fd00:fd00:fd00:5000::10
+  TenantNetCidr: fd00:fd00:fd00:5000::/64
+
+  InternalApiNetworkVlanID: 230
+  TenantNetworkVlanID: 231
+  StorageNetworkVlanID: 232
+  StorageMgmtNetworkVlanID: 233
+
+  NeutronOverlayIPVersion: 6
+  InternalApiNetworkVlanID: 230
+  DnsServers: ["10.46.0.31","10.46.0.32"]
+  NeutronExternalNetworkBridge: "''"
+  NeutronNetworkType: 'vxlan,vlan,flat'
+  NeutronTunnelTypes: 'vxlan'
+  NeutronBridgeMappings: 'datacentre:br-ext,tenant:br-data'
+  NeutronNetworkVLANRanges: 'datacentre:319:319'
+  #datacentre:225:229
+  OvercloudControlFlavor: controller
+  OvercloudComputeSriovFlavor: compute
+  # Number of nodes to deploy.
+  ControllerCount: 3
+  ComputeCount: 2
+  NtpServer: clock.redhat.com
+
+###EXTRA###
+
+  ControllerHostnameFormat: 'controller-%index%'
+  ComputeHostnameFormat: 'compute-%index%'
+  NeutronMechanismDrivers: "openvswitch"
+  Debug: True
