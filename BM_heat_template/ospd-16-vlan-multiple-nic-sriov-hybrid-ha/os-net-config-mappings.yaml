@@ -1,0 +1,12 @@
+resource_registry:
+  OS::TripleO::Compute::NodeUserData: /usr/share/openstack-tripleo-heat-templates/firstboot/os-net-config-mappings.yaml
+
+parameter_defaults:
+  NetConfigDataLookup:
+    computeovsdpdksriovgroup:
+      dmiString: "system-product-name"
+      id: "PowerEdge R730"
+      nic1: "eno1" # In biosdevname "em1"
+      nic2: "eno2" # In biosdevname "em2"
+      nic3: "enp5s0f0" # In biosdevname "p1p1"
+      nic4: "enp5s0f1" # In biosdevname "p1p2"
