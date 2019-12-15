@@ -181,6 +181,8 @@ resources:
               network_config:
               - type: interface
                 name: nic1
+                dns_servers:
+                  get_param: DnsServers
                 addresses:
                 - ip_netmask:
                     list_join:
