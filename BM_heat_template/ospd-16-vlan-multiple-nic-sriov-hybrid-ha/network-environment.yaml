@@ -60,7 +60,7 @@ parameter_defaults:
       physical_network: "datacentre"
       #vlan: [224, 228]
   NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
-  NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','RamFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
+  NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
   NeutronSupportedPCIVendorDevs: ['8086:154d', '8086:10ed']
   NeutronPhysicalDevMappings: "datacentre:enp5s0f0"
   #NeutronSriovNumVFs: "enp5s0f0:5"
