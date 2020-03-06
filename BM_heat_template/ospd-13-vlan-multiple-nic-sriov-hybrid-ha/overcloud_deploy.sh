@@ -12,5 +12,4 @@ openstack overcloud deploy  \
 -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha/docker-images.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha/network-environment.yaml \
--e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha/inject-trust-anchor.yaml \
 --log-file overcloud_install.log &> overcloud_install.log
