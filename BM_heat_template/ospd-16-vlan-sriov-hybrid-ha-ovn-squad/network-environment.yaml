@@ -3,6 +3,7 @@ resource_registry:
   OS::TripleO::ComputeSriov::Net::SoftwareConfig: nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
   OS::TripleO::Services::NeutronDhcpAgent: /usr/share/openstack-tripleo-heat-templates/deployment/neutron/neutron-dhcp-container-puppet.yaml
+  #OS::TripleO::ComputeSriovExtraConfigPre: compute-pre-config.yaml
 parameter_defaults:
   # Customize all these values to match the local environment
   InternalApiNetCidr: 10.20.1.0/24
@@ -50,9 +51,16 @@ parameter_defaults:
   ComputeSriovCount: 2
   NtpServer: clock.redhat.com
 
-#### Extras ####
+ # Ironic mapping
   ControllerHostnameFormat: 'controller-%index%'
+  ControllerSchedulerHints:
+    'capabilities:node': 'controller-%index%'
   ComputeSriovHostnameFormat: 'computesriov-%index%'
+  ComputeSriovSchedulerHints:
+    'capabilities:node': 'compute-%index%'
+
+
+#### Extras ####
   #NeutronMechanismDrivers: ['sriovnicswitch', 'openvswitch']
   NeutronMechanismDrivers: "ovn,sriovnicswitch"
 
@@ -60,12 +68,12 @@ parameter_defaults:
     - devname: "p5p4"
       physical_network: "datacentre"
   NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
-  NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','RamFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
+  NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
   NeutronSupportedPCIVendorDevs: ['8086:1572', '8086:154d', '8086:10ed']
   NeutronPhysicalDevMappings: "datacentre:p5p4"
   NeutronSriovNumVFs: "p5p4:5"
   ComputeSriovParameters:
-    KernelArgs: "biosdevname=1 default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
+    KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
     TunedProfileName: "cpu-partitioning"
     IsolCpusList: "2-23"
     NovaReservedHostMemory: 4096

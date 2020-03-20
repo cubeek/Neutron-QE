@@ -188,7 +188,7 @@ resources:
             $network_config:
               network_config:
               - type: interface
-                name: eth0
+                name: nic1
                 use_dhcp: false
                 dns_servers:
                   get_param: DnsServers
@@ -206,7 +206,7 @@ resources:
               - type: vlan
                 vlan_id:
                   get_param: InternalApiNetworkVlanID
-                device: eth0
+                device: nic1
                 addresses:
                 - ip_netmask:
                     get_param: InternalApiIpSubnet
@@ -214,7 +214,7 @@ resources:
               - type: vlan
                 vlan_id:
                   get_param: TenantNetworkVlanID
-                device: eth0
+                device: nic1
                 addresses:
                 - ip_netmask:
                     get_param: TenantIpSubnet
@@ -222,7 +222,7 @@ resources:
               - type: vlan
                 vlan_id:
                   get_param: StorageNetworkVlanID
-                device: eth0
+                device: nic1
                 addresses:
                 - ip_netmask:
                     get_param: StorageIpSubnet
@@ -230,7 +230,7 @@ resources:
               - type: vlan
                 vlan_id:
                   get_param: StorageMgmtNetworkVlanID
-                device: eth0
+                device: nic1
                 addresses:
                 - ip_netmask:
                     get_param: StorageMgmtIpSubnet
@@ -242,7 +242,7 @@ resources:
                   get_param: DnsServers
                 members:
                   - type: interface
-                    name: eth1
+                    name: nic2
                     primary: true
 
                   - type: vlan
