@@ -229,16 +229,18 @@ resources:
                 dns_servers:
                   get_param: DnsServers
                 members:
-                  - type: interface
+                  - type: sriov_pf
                     name: nic3
+                    numvfs: 5
                     primary: true
 
-              - type: interface
+              - type: sriov_pf
                 name: nic4
                 use_dhcp: false
                 defroute: false
                 nm_controlled: true
                 hotplug: true
+                numvfs: 5
 
 outputs:
   OS::stack_id:
