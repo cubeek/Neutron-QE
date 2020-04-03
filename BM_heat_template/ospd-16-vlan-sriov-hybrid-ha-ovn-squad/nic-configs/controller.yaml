@@ -187,6 +187,7 @@ resources:
           params:
             $network_config:
               network_config:
+
               - type: interface
                 name: nic1
                 use_dhcp: false
@@ -213,14 +214,6 @@ resources:
 
               - type: vlan
                 vlan_id:
-                  get_param: TenantNetworkVlanID
-                device: nic1
-                addresses:
-                - ip_netmask:
-                    get_param: TenantIpSubnet
-
-              - type: vlan
-                vlan_id:
                   get_param: StorageNetworkVlanID
                 device: nic1
                 addresses:
@@ -234,6 +227,14 @@ resources:
                 addresses:
                 - ip_netmask:
                     get_param: StorageMgmtIpSubnet
+
+              - type: vlan
+                vlan_id:
+                  get_param: TenantNetworkVlanID
+                device: nic2
+                addresses:
+                - ip_netmask:
+                    get_param: TenantIpSubnet
 
               - type: ovs_bridge
                 name: br-ext-int
@@ -256,6 +257,10 @@ resources:
                       next_hop:
                         get_param: ExternalInterfaceDefaultRoute
 
+              - type: ovs_bridge
+                name: br-int
+                use_dhcp: false
+                device: nic1
 
 outputs:
   OS::stack_id:

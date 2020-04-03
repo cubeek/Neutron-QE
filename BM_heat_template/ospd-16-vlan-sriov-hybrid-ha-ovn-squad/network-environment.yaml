@@ -28,7 +28,7 @@ parameter_defaults:
   EC2MetadataIp: 192.168.25.1
 
   InternalApiNetworkVlanID: 230
-  TenantNetworkVlanID: 231
+  TenantNetworkVlanID: 320
   StorageNetworkVlanID: 232
   StorageMgmtNetworkVlanID: 233
 
@@ -39,10 +39,11 @@ parameter_defaults:
   NeutronNetworkType: 'vlan,flat'
   #OVNTunnelEncapType: 'vlan'
   NeutronTunnelTypes: ''
-  NeutronBridgeMappings: 'datacentre:br-ext-int'
-  NeutronNetworkVLANRanges: 'datacentre:319:319,datacentre:320:324'
+  NeutronBridgeMappings: 'datacentre:br-ext-int,tenant:br-int'
+  NeutronNetworkVLANRanges: 'datacentre:319:319,datacentre:321:324'
   OvercloudControlFlavor: controller
   OvercloudComputeSriovFlavor: compute
+  NeutronEnableDVR: false
 
  # Number of nodes to deploy.
   ControllerCount: 3
