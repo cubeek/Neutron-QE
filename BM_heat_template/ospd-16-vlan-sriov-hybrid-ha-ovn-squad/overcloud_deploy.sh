@@ -2,7 +2,7 @@
 THT_PATH='/home/stack/ospd-16-vlan-sriov-hybrid-ha-ovn-squad'
 
 if [[ ! -f "$THT_PATH/roles_data.yaml" ]]; then
-  openstack overcloud roles generate -o $THT_PATH/roles_data.yaml Controller ComputeSriov
+  openstack overcloud roles generate -o $THT_PATH/roles_data.yaml ControllerSriov ComputeSriov
 fi
 
 openstack -vvv overcloud deploy  \

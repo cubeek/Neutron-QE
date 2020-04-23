@@ -1,7 +1,7 @@
 resource_registry:
   # Specify the relative/absolute path to the config files you want to use for override the default.
   OS::TripleO::ComputeSriov::Net::SoftwareConfig: nic-configs/compute.yaml
-  OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
+  OS::TripleO::ControllerSriov::Net::SoftwareConfig: nic-configs/controller.yaml
 parameter_defaults:
   # Customize all these values to match the local environment
   InternalApiNetCidr: 10.20.1.0/24
@@ -46,13 +46,13 @@ parameter_defaults:
   NeutronEnableDVR: false
 
  # Number of nodes to deploy.
-  ControllerCount: 3
+  ControllerSriovCount: 3
   ComputeSriovCount: 2
   NtpServer: clock.redhat.com
 
  # Ironic mapping
-  ControllerHostnameFormat: 'controller-%index%'
-  ControllerSchedulerHints:
+  ControllerSriovHostnameFormat: 'controller-%index%'
+  ControllerSriovSchedulerHints:
     'capabilities:node': 'controller-%index%'
   ComputeSriovHostnameFormat: 'computesriov-%index%'
   ComputeSriovSchedulerHints:
