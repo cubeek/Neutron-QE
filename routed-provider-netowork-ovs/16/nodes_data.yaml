@@ -1,0 +1,13 @@
+parameter_defaults:
+  OvercloudController0Flavor: control0
+  Controller0Count: 3
+  OvercloudCompute0Flavor: compute0
+  Compute0Count: 1
+  OvercloudCompute1Flavor: compute1
+  Compute1Count: 1
+  OvercloudCompute2Flavor: compute2
+  Compute2Count: 1
+  Controller0ControlPlaneSubnet: leaf0
+  Compute0ControlPlaneSubnet: leaf0
+  Compute1ControlPlaneSubnet: leaf1
+  Compute2ControlPlaneSubnet: leaf2
