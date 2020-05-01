@@ -1,0 +1,32 @@
+resource_registry:
+  OS::TripleO::ComputeSriov::NodeUserData: /usr/share/openstack-tripleo-heat-templates/firstboot/os-net-config-mappings.yaml
+
+parameter_defaults:
+  NetConfigDataLookup:
+    computesriov1:
+      dmiString: "system-uuid"
+      id: "4c4c4544-0047-3410-8059-c4c04f395132"
+      nic1: "enp7s0f0"    # In biosdevname "p5p1"
+                          # In predictable name "enp7s0f0"
+      nic2: "enp7s0f1"        # In biosdevname "p5p2"
+                          # In predictable name "enp7s0f1"
+      nic3: "enp7s0f2"        # In biosdevname "p5p3"
+                          # In predictable name "enp7s0f2"
+      nic4: "enp7s0f3"        # In biosdevname "p5p4"
+                          # In predictable name "enp7s0f3"
+      #nic5: "p7p1"        # In biosdevname "p7p1"
+                          # In predictable name "enp5s0f2"
+
+    computesriov0:
+      dmiString: "system-uuid"
+      id: "4c4c4544-0047-3310-8059-c4c04f395132"
+      nic1: "enp6s0f0"    # In biosdevname "p5p1"
+                          # In predictable name "enp6s0f0"
+      nic2: "enp6s0f1"        # In biosdevname "p5p2"
+                          # In predictable name "enp6s0f1"
+      nic3: "enp6s0f2"        # In biosdevname "p5p3"
+                          # In predictable name "enp6s0f2"
+      nic4: "enp6s0f3"        # In biosdevname "p5p4"
+                          # In predictable name "enp6s0f3"
+      #nic5: "p7p1"        # In biosdevname "p7p1"
+                          # In predictable name "enp5s0f2"
