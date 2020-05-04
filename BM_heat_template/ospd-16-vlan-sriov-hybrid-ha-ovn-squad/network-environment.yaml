@@ -40,7 +40,7 @@ parameter_defaults:
   #OVNTunnelEncapType: 'vlan'
   NeutronTunnelTypes: ''
   NeutronBridgeMappings: 'datacentre:br-ext-int,tenant:br-int'
-  NeutronNetworkVLANRanges: 'datacentre:319:319,datacentre:321:324'
+  NeutronNetworkVLANRanges: 'datacentre:319:319,datacentre:321:324,datacentre:354:368'
   OvercloudControlFlavor: controller
   OvercloudComputeSriovFlavor: compute
   NeutronEnableDVR: false
