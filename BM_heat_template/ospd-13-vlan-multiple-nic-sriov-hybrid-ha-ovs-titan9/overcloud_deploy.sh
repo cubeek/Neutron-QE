@@ -13,6 +13,6 @@ openstack -vvv overcloud deploy  \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
 -e $THT_PATH/network-environment.yaml \
--e /home/stack/containers-prepare-parameter.yaml \
+-e $THT_PATH/docker-images.yaml \
 -e $THT_PATH//os-net-config-mappings.yaml \
 --log-file overcloud_install.log &> overcloud_install.log
