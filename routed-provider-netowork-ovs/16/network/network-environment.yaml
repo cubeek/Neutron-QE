@@ -104,10 +104,10 @@ parameter_defaults:
     TenantNetworkVlanID_tenant_leaf1: 1179
 
 resource_registry:
-    OS::TripleO::Compute0::Net::SoftwareConfig: spine-leaf-nics/compute0.yaml
-    OS::TripleO::Compute1::Net::SoftwareConfig: spine-leaf-nics/compute1.yaml
-    OS::TripleO::Compute2::Net::SoftwareConfig: spine-leaf-nics/compute2.yaml
-    OS::TripleO::Controller0::Net::SoftwareConfig: spine-leaf-nics/controller0.yaml
+    OS::TripleO::Compute0::Net::SoftwareConfig: nics/compute0.yaml
+    OS::TripleO::Compute1::Net::SoftwareConfig: nics/compute1.yaml
+    OS::TripleO::Compute2::Net::SoftwareConfig: nics/compute2.yaml
+    OS::TripleO::Controller0::Net::SoftwareConfig: nics/controller0.yaml
     OS::TripleO::Network::Ports::OVNDBsVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
     OS::TripleO::Network::Ports::RedisVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
     OS::TripleO::Services::Docker: OS::Heat::None
