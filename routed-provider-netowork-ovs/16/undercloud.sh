@@ -10,13 +10,13 @@ for ROLE in $ROLES; do openstack flavor create --id auto --ram 4096 --disk 37 --
 for ROLE in $ROLES; do openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:boot_option"="local" --property "capabilities:profile"="$ROLE" --property resources:CUSTOM_BAREMETAL='1' --property resources:DISK_GB='0' --property resources:MEMORY_MB='0' --property resources:VCPU='0' $ROLE ; done
 
 
-openstack baremetal node set --property capabilities='profile:control0,boot_option:local' controller-0
-openstack baremetal node set --property capabilities='profile:control0,boot_option:local' controller-1
-openstack baremetal node set --property capabilities='profile:control0,boot_option:local' controller-2
-openstack baremetal node set --property capabilities='profile:compute0,boot_option:local' compute-0
-openstack baremetal node set --property capabilities='profile:compute1,boot_option:local' compute-1
-openstack baremetal node set --property capabilities='profile:compute2,boot_option:local' compute-2
-
+openstack baremetal node set --property capabilities='profile:control0,boot_option:local' site-controller-0
+openstack baremetal node set --property capabilities='profile:control0,boot_option:local' site-controller-1
+openstack baremetal node set --property capabilities='profile:control0,boot_option:local' site-controller-2
+openstack baremetal node set --property capabilities='profile:compute0,boot_option:local' site-compute-0
+openstack baremetal node set --property capabilities='profile:compute0,boot_option:local' site-compute-1
+openstack baremetal node set --property capabilities='profile:compute1,boot_option:local' dcn1-compute-0
+openstack baremetal node set --property capabilities='profile:compute2,boot_option:local' dcn2-compute-0
 
 ## Mapping bare metal node ports to control plane network segments
 
