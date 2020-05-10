@@ -211,7 +211,7 @@ function download_file() {
   local_file_size=$([[ -f ${FILE_NAME} ]] && wc -c < ${FILE_NAME} || echo "0")
   remote_file_size=$(curl -sI ${FILE_PATH} | awk '/Content-Length/ { print $2 }' | tr -d '\r' )
   if [[ "$local_file_size" -ne "$remote_file_size" ]]; then
-      curl -o ${FILE_NAME} ${FILE_PATH}
+      curl -Lo ${FILE_NAME} ${FILE_PATH}
   else
     echo "$FILE_NAME already downloaded, and equals to remote file $FILE_PATH"
   fi
@@ -419,9 +419,9 @@ fi
 
 # Check OSP version and Overcloud deployment
 
-osp_version=$(cat /etc/yum.repos.d/latest-installed)
+osp_version=$(at /var/lib/rhos-release/latest-installed | awk '{print $1}' )
 prompt "Base OSP version: $osp_version"
-prompt "Currently deployed puddle: $(cat /etc/yum.repos.d/rhos-release-*.repo | grep -m 1 puddle_baseurl)"
+prompt "Currently deployed puddle: $(at /var/lib/rhos-release/latest-installed | awk '{print $3}')"
 
 osp_version=$(echo $osp_version | awk '{print $1}')
 
