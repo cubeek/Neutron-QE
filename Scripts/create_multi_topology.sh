@@ -680,7 +680,8 @@ if [[ $tenant_enable = YES ]] ; then
   prompt "Creating Tenant user \"tester\" - a privileged user (non-admin)"
   openstack $debug project create test_cloud --enable
   openstack $debug user create tester --enable --password testerpass --project test_cloud
-  openstack $debug role add _member_ --user tester --project test_cloud
+  [[ $osp_version < 14 ]] && member_role=Member || member_role=member
+  openstack $debug role add $member_role --user tester --project test_cloud
   openstack user list
   openstack role list
 
