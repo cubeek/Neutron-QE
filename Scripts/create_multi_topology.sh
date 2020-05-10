@@ -419,9 +419,9 @@ fi
 
 # Check OSP version and Overcloud deployment
 
-osp_version=$(at /var/lib/rhos-release/latest-installed | awk '{print $1}' )
+osp_version=$(cat /var/lib/rhos-release/latest-installed | awk '{print $1}' )
 prompt "Base OSP version: $osp_version"
-prompt "Currently deployed puddle: $(at /var/lib/rhos-release/latest-installed | awk '{print $3}')"
+prompt "Currently deployed puddle: $(cat /var/lib/rhos-release/latest-installed | awk '{print $3}')"
 
 osp_version=$(echo $osp_version | awk '{print $1}')
 
