@@ -1,6 +1,9 @@
 #!/bin/bash
 THT_PATH='/home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-titan9'
 
+if [[ ! -f "$THT_PATH/roles_data.yaml" ]]; then
+  openstack overcloud roles generate -o $THT_PATH/roles_data.yaml Controller ComputeSriov
+fi
 
 openstack -vvv overcloud deploy  \
 --templates \
