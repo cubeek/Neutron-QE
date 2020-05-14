@@ -63,20 +63,17 @@ parameter_defaults:
   NeutronMechanismDrivers: ['sriovnicswitch', 'openvswitch']
   #NeutronMechanismDrivers: "ovn,sriovnicswitch"
   NovaPCIPassthrough:
-    - devname: "enp6s0f3"
-      trusted: "true"
-      physical_network: "datacentre"
-    - devname: "enp7s0f3"
+    - devname: "p5p4"
       trusted: "true"
       physical_network: "datacentre"
 
   NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
   NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
-  NeutronPhysicalDevMappings: "datacentre:enp6s0f3,datacentre:enp7s0f3"
+  NeutronPhysicalDevMappings: "datacentre:p5p4"
   NeutronSupportedPCIVendorDevs: ['8086:154c', '8086:1572']
-  NeutronSriovNumVFs: ["enp6s0f3:5", "enp7s0f3:5"]
+  NeutronSriovNumVFs: ["p5p4:5"]
   ComputeSriovParameters:
-    KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on biosdevname=3"
+    KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
     TunedProfileName: "cpu-partitioning"
     IsolCpusList: "2-23"
     NovaReservedHostMemory: 4096
