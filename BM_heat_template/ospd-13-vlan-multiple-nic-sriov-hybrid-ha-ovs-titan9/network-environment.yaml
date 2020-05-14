@@ -76,7 +76,7 @@ parameter_defaults:
   NeutronSupportedPCIVendorDevs: ['8086:154c', '8086:1572']
   NeutronSriovNumVFs: ["enp6s0f3:5", "enp7s0f3:5"]
   ComputeSriovParameters:
-    KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
+    KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on biosdevname=3"
     TunedProfileName: "cpu-partitioning"
     IsolCpusList: "2-23"
     NovaReservedHostMemory: 4096
