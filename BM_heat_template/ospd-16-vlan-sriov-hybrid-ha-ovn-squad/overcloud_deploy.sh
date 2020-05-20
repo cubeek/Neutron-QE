@@ -14,6 +14,7 @@ openstack -vvv overcloud deploy  \
 -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/services/neutron-ovn-dvr-ha.yaml \
 -e /home/stack/containers-prepare-parameter.yaml \
+-e $THT_PATH/api-policies.yaml \
 -e $THT_PATH/network-environment.yaml \
 -e $THT_PATH/os-net-config-mappings.yaml \
 -e $THT_PATH/nova-resize-on-the-same-host.yaml \
