@@ -10,9 +10,8 @@ openstack -vvv overcloud deploy  \
 --timeout 120 \
 -r /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-titan9/roles_data.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
--e /usr/share/openstack-tripleo-heat-templates/environments/services/neutron-sriov.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
--e /usr/share/openstack-tripleo-heat-templates/environments/services/neutron-sriov.yaml \
+-e /usr/share/openstack-tripleo-heat-templates/environments/neutron-sriov.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-titan9/network-environment.yaml \
