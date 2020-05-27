@@ -3,6 +3,8 @@ resource_registry:
   OS::TripleO::ComputeSriov::Net::SoftwareConfig: nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
 parameter_defaults:
+  #Enable isolated metadata for provider networks
+  NeutronEnableIsolatedMetadata: 'True'
   # Customize all these values to match the local environment
   InternalApiNetCidr: 10.20.1.0/24
   TenantNetCidr: 10.20.2.0/24
