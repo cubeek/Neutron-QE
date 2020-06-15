@@ -182,8 +182,6 @@
   tags:
     - external_bridge
   networks:
-    External:
-      subnet: external_subnet
     InternalApi:
       subnet: internal_api_subnet
     Tenant:
@@ -254,8 +252,6 @@
   tags:
     - external_bridge
   networks:
-    External:
-      subnet: external_leaf1
     InternalApi:
       subnet: internal_api_leaf1
     Tenant:
@@ -326,8 +322,6 @@
   tags:
     - external_bridge
   networks:
-    External:
-      subnet: external_leaf2
     InternalApi:
       subnet: internal_api_leaf2
     Tenant:
