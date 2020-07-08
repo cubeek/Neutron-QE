@@ -2,10 +2,19 @@
 - name: External
   name_lower: external
   vip: true
-  vlan: 10
   ip_subnet: '10.0.10.0/24'
-  allocation_pools: [{'start': '10.0.10.100', 'end': '10.0.10.119'}]
+  allocation_pools: [{'start': '10.0.10.100', 'end': '10.0.10.149'}]
   gateway_ip: '10.0.10.1'
+  subnets:
+    external_leaf1:
+      ip_subnet: '10.0.20.0/24'
+      allocation_pools: [{'start': '10.0.20.100', 'end': '10.0.20.149'}]
+      gateway_ip: '10.0.20.1'
+    external_leaf2:
+      ip_subnet: '10.0.30.0/24'
+      allocation_pools: [{'start': '10.0.30.100', 'end': '10.0.30.149'}]
+      gateway_ip: '10.0.30.1'
+
 
 # Storage
 - name: Storage

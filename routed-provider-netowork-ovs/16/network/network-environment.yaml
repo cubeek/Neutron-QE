@@ -19,8 +19,8 @@ parameter_defaults:
     - 10.11.5.19
     - 10.5.30.160
     ExternalAllocationPools:
-    -   end: 10.0.10.119
-        start: 10.0.10.100
+    -   end: 10.0.10.149
+        start: 10.0.10.101
     ExternalInterfaceDefaultRoute: 10.0.10.1
     ExternalNetCidr: 10.0.10.0/24
     ExternalNetworkVlanID: 10
