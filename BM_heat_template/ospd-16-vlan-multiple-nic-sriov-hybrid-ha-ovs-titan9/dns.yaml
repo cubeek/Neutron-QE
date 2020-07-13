@@ -1,0 +1,4 @@
+parameter_defaults:
+    ExtraConfig:
+        neutron::dns_domain: openstackgate.local
+    NeutronPluginExtensions: qos,port_security,dns

@@ -14,9 +14,9 @@ openstack -vvv overcloud deploy  \
 -e /usr/share/openstack-tripleo-heat-templates/environments/neutron-sriov.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
--e /home/stack/ospd-16-vlan-sriov-hybrid-ha-ovn-squad/l3_fip_qos.yaml \
--e /home/stack/16_vlan/dns.yaml \
--e /home/stack/16_vlan/nova-resize-on-the-same-host.yaml \
+-e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-titan9/l3_fip_qos.yaml \
+-e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-titan9/dns.yaml \
+-e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-titan9/nova-resize-on-the-same-host.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-titan9/network-environment.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-titan9/docker-images.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-titan9/os-net-config-mappings.yaml \
