@@ -21,9 +21,21 @@ parameter_defaults:
     ExternalAllocationPools:
     -   end: 10.0.10.149
         start: 10.0.10.101
+    ExternalAllocationPools_external_leaf1:
+    -   end: 10.0.20.149
+        start: 10.0.20.101
+    ExternalAllocationPools_external_leaf2:
+    -   end: 10.0.30.149
+        start: 10.0.30.101
     ExternalInterfaceDefaultRoute: 10.0.10.1
+    ExternalInterfaceDefaultRoute_external_leaf1: 10.0.20.1
+    ExternalInterfaceDefaultRoute_external_leaf2: 10.0.30.1
     ExternalNetCidr: 10.0.10.0/24
+    ExternalNetCidr_external_leaf1: 10.0.20.0/24
+    ExternalNetCidr_external_leaf2: 10.0.30.0/24
     ExternalNetworkVlanID: 10
+    ExternalNetworkVlanID_external_leaf1: 20
+    ExternalNetworkVlanID_external_leaf2: 30
     InternalApiAllocationPools:
     -   end: 172.25.1.250
         start: 172.25.1.4
