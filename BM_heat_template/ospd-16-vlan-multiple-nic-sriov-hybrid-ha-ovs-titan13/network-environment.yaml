@@ -10,7 +10,7 @@ parameter_defaults:
   TenantNetCidr: 10.20.2.0/24
   StorageNetCidr: 10.20.3.0/24
   StorageMgmtNetCidr: 10.20.4.0/24
-  ExternalNetCidr: 10.46.54.6/26
+  ExternalNetCidr: 10.46.54.6/24
 
  # CIDR subnet mask length for provisioning network
   ControlPlaneSubnetCidr: '24'
@@ -65,14 +65,14 @@ parameter_defaults:
   NeutronMechanismDrivers: ['sriovnicswitch', 'openvswitch']
   #NeutronMechanismDrivers: "ovn,sriovnicswitch"
   NovaPCIPassthrough:
-    - devname: "enp5s0f3"
+    - devname: "enp6s0f3"
       trusted: "true"
       physical_network: "datacentre"
 
   NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
   NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
   NeutronPhysicalDevMappings: "datacentre:enp6s0f3"
-  NeutronSupportedPCIVendorDevs: ['8086:154c', '8086:1572']
+  NeutronSupportedPCIVendorDevs: ['8086:1572']
   NeutronSriovNumVFs: ["enp6s0f3:5"]
   ComputeSriovParameters:
     KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
