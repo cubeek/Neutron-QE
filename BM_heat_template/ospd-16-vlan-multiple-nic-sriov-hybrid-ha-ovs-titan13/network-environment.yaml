@@ -34,7 +34,7 @@ parameter_defaults:
   StorageNetworkVlanID: 282
   StorageMgmtNetworkVlanID: 283
 
-  ExternalNetworkVlanID: 589
+  ExternalNetworkVlanID: 408
 
   DnsServers: ["10.46.0.31","10.46.0.32"]
   NeutronExternalNetworkBridge: "''"
