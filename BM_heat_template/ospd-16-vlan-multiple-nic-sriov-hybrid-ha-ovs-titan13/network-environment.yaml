@@ -30,11 +30,11 @@ parameter_defaults:
   EC2MetadataIp: 192.168.25.1
 
   InternalApiNetworkVlanID: 280
-  TenantNetworkVlanID: 409
+  TenantNetworkVlanID: 410
   StorageNetworkVlanID: 282
   StorageMgmtNetworkVlanID: 283
 
-  ExternalNetworkVlanID: 408
+  ExternalNetworkVlanID: 411
 
   DnsServers: ["10.46.0.31","10.46.0.32"]
   NeutronExternalNetworkBridge: "''"
@@ -42,7 +42,7 @@ parameter_defaults:
   #OVNTunnelEncapType: 'vlan'
   NeutronTunnelTypes: ''
   NeutronBridgeMappings: 'datacentre:br-ext-int,tenant:br-int'
-  NeutronNetworkVLANRanges: 'datacentre:408:408,datacentre:410:434'
+  NeutronNetworkVLANRanges: 'datacentre:411:411,datacentre:412:434'
   OvercloudControlFlavor: controller
   OvercloudComputeSriovFlavor: compute
   NeutronEnableDVR: false
