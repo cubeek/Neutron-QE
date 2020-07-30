@@ -20,7 +20,7 @@ parameter_defaults:
   StorageMgmtAllocationPools: [{'start': '10.20.4.61', 'end': '10.20.4.80'}]
 
   # Use an External allocation pool which will leave room for floating IPs
-  ExternalAllocationPools: [{'start': ' 10.46.54.2', 'end': ' 10.46.54.21'}]
+  ExternalAllocationPools: [{'start': '10.46.54.2', 'end': '10.46.54.21'}]
   # Set to the router gateway on the external network
   ExternalInterfaceDefaultRoute: 10.46.54.62
 
