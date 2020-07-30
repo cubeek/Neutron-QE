@@ -1,6 +1,6 @@
 #!/bin/bash
 ####################################################################################
-# By Eran Kuris and Noam Manos, 2019 ###############################################
+# By Eran Kuris and Noam Manos, 2020 ###############################################
 ####################################################################################
 
 # Script description
@@ -8,14 +8,14 @@ disclosure='--------------------------------------------------------------------
 
 This is an interactive script to create and test OpenStack topologies including:
 
-* Multiple VM instances of following Operating Systems: RHEL (8.0, 7.6, 7.5, 7.4), Cirros and Windows.
+* Multiple VM instances of following Operating Systems: RHEL (8.0, 7.6, 7.5, 7.4), Cirros (5.1) and Windows (2019).
 * Multiple Networks and NICs with IPv4 & IPv6 subnets and Floating IPs, connected to external networks (Flat / Vlan)
 * Tests includes: SSH Keypair, non-admin Tenant, Security group for HTTP/S, North-South, East-West, SNAT, and more.
 
 Running with pre-defined parameters (optional):
 
 * To show this help menu:                               -h / --help
-* To set VM image:                                      -i / --image    [ rhel74 / rhel75 / rhel76 / rhel80 / cirros40 / win2019 ]
+* To set VM image:                                      -i / --image    [ rhel74 / rhel75 / rhel76 / rhel80 / cirros51 / win2019 ]
 * To set topology - Multiple VMs or multiple NICs:      -t / --topology [ mni = Multiple Networks Interfaces / mvi = Multiple VM Instances ]
 * To set the number of networks:                        -n / --networks [ 1-100 ]
 * To set the number of VMs:                             -v / --machines [ 1-100 ]
@@ -34,7 +34,7 @@ Command examples:
 
   Will run interactively (enter choices during execution).
 
-# ./create_multi_topology.sh -x -t mvi -i cirros40 -n 2 -v 2 -e skip -c YES
+# ./create_multi_topology.sh -x -t mvi -i cirros51 -n 2 -v 2 -e skip -c YES
 
   Will create and test Multiple VMs (4 total).
   On each of the 2 Networks - 2 CirrOS connected:
@@ -61,12 +61,11 @@ log_file=multi_topology_$(date +%d-%m-%Y_%H%M).log
 ####################################################################################
 
 # Default variables
-
-export RED='\e[0;31m'
-export GREEN='\e[38;5;22m'
-export CYAN='\e[36m'
-export YELLOW='\e[1;33m'
-export NO_COLOR='\e[0m'
+export RED='\x1b[0;31m'
+export GREEN='\x1b[38;5;22m'
+export CYAN='\x1b[36m'
+export YELLOW='\x1b[33m'
+export NO_COLOR='\x1b[0m'
 export HAT="${RED}🎩︎${NO_COLOR}"
 export PYTHONIOENCODING=utf8
 
@@ -80,18 +79,18 @@ export default_network_type=flat
 export default_physical_network=datacentre
 
 # RHEL Images
-export rhel_images_url='http://file.tlv.redhat.com/~nmanos/rhel-custom-images/'
+export rhel_images_url='http://file.tlv.redhat.com/~nmanos/rhel-custom-images'
 export RHEL74_IMG='rhel-guest-image-7.4-290_apache_php.qcow2'
 export RHEL75_IMG='rhel-guest-image-7.5-190_apache_php.qcow2'
 export RHEL76_IMG='rhel-guest-image-7.6-210_apache_php.qcow2'
 export RHEL80_IMG='rhel-guest-image-8.0-1736_apache_php.qcow2'
 
 # CIRROS Images
-export cirros40_images_url='http://download.cirros-cloud.net/0.4.0/'
-export CIRROS40_IMG='cirros-0.4.0-x86_64-disk.img'
+export cirros51_images_url='http://download.cirros-cloud.net/0.5.1'
+export CIRROS51_IMG='cirros-0.5.1-x86_64-disk.img'
 
 # Windows Images
-export win_images_url='http://file.tlv.redhat.com/~nmanos/windows-custom-images/'
+export win_images_url='http://file.tlv.redhat.com/~nmanos/windows-custom-images'
 export WIN2019_IMG='windows_2019_ssh.qcow2'
 
 ####################################################################################
@@ -180,40 +179,46 @@ function prompt() {
   eval 'echo -e "\n'$PS1'$1\n"' | sed -e 's#\\\[##g' -e 's#\\\]##g';
 }
 
-# Function to print each bash command before it is executed
 function trap_commands() {
   # When using -x / --trace option
   if [[ "$trace_bash" = YES ]]; then
-    trap '! [[ "$BASH_COMMAND" =~ ^(echo|read|\[\[|while|for|prompt) ]] && \
-  cmd=`eval echo -e "[${PWD##*/}]\$ $BASH_COMMAND" 2>/dev/null` && \
+    trap '[[ "$BASH_COMMAND" =~ ^(echo|read|while|for|prompt) ]] || \
+  cmd="[${PWD##*/}]\$ `eval echo $BASH_COMMAND 2>/dev/null`" && \
   echo -e "${CYAN}$cmd${NO_COLOR}"' DEBUG
   fi
 }
-export -f trap_commands
 
 # Function to download file from URL, if local file doesn't exists, or has a different size on URL
 function download_file() {
-  trap_commands;
-  # FILE_DIR => $1
-  # FILE_NAME => $2
+  trap_commands
+  # $1 => $source_file (download link)
+  source_file="$1"
 
-  if [[ -z "$2" ]]; then
-    FILE_PATH="$1"
-    FILE_NAME=$(basename "$1")
-  else
-    FILE_PATH="$1/$2"
-    FILE_NAME=$2
-  fi
+  # Optional: $2 => $target_file (where to save)
+  target_file=${2:-$(basename "$1")}
 
-  echo "Downloading $FILE_NAME from: $FILE_PATH"
-  # wget does not always exists on hosts, using curl instead
-  # wget -nc ${FILE_PATH} --no-check-certificate
-  local_file_size=$([[ -f ${FILE_NAME} ]] && wc -c < ${FILE_NAME} || echo "0")
-  remote_file_size=$(curl -sI ${FILE_PATH} | awk '/Content-Length/ { print $2 }' | tr -d '\r' )
+  echo "# Downloading [$source_file] into $target_file"
+  ls -ld
+
+  local_file_size=$([[ -f ${target_file} ]] && wc -c < ${target_file} || echo "0")
+  echo "local_file_size = $local_file_size"
+  remote_file_size=$(curl -sI ${source_file} | awk '/Content-Length/ { print $2 }' | tr -d '\r' )
+  echo "remote_file_size = $remote_file_size"
+  [[ -n "$remote_file_size" ]] || remote_file_size=-1
   if [[ "$local_file_size" -ne "$remote_file_size" ]]; then
-      curl -Lo ${FILE_NAME} ${FILE_PATH}
+      echo "# Requested file was not downloaded yet, or remote file size is different. Downloading..."
+      rm -rf "$target_file"
+      if [[ $(which wget) ]] ; then
+        target_dir=$(dirname -- "$target_file")
+        wget "$source_file" --no-verbose --no-check-certificate --directory-prefix="$target_dir"
+        source_file=$(basename -- "$source_file")
+        mv "$target_dir/$source_file" "$target_file" || :
+      else
+        echo "# Wget is not installed, using Curl instead."
+        curl -L "$source_file" -o "$target_file" --create-dirs
+      fi
   else
-    echo "$FILE_NAME already downloaded, and equals to remote file $FILE_PATH"
+    echo "# $target_file already downloaded, and equals to remote file $source_file"
   fi
 }
 
@@ -339,49 +344,49 @@ function test_connectivity() {
 function run_cleanup() {
   trap_commands;
   prompt "Deleting all VM instances"
-  for vm in $(openstack server list --all -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack server delete $vm; done
+  for vm in $(openstack server list --all -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack server delete $vm || : ; done
 
   for router in $(openstack router list -c ID -f value | grep -v "^$"); do
     prompt "Removing all subnets from router (ID: $router)"
-    for subnet in $(openstack subnet list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug router remove subnet $router $subnet; done;
+    for subnet in $(openstack subnet list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug router remove subnet $router $subnet || : ; done;
   done
 
   prompt "Deleting all floating ips"
-  for fip in $(openstack floating ip list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug floating ip delete $fip; done
+  for fip in $(openstack floating ip list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug floating ip delete $fip || : ; done
 
   #for OSP 13 might need to use: neutron router-gateway-clear
   prompt "Unsetting external gateway from all routers"
-  for router in $(openstack router list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug router unset --external-gateway $router; done
+  for router in $(openstack router list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug router unset --external-gateway $router || : ; done
 
   prompt "Deleting all trunks"
-  for trunk in $(openstack network trunk list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug network trunk delete $trunk; done
+  for trunk in $(openstack network trunk list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug network trunk delete $trunk || : ; done
 
   prompt "Deleting all ports"
-  for port in $(openstack port list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug port delete $port; done
+  for port in $(openstack port list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug port delete $port || : ; done
 
   prompt "Deleting all subnets"
-  for subnet in $(openstack network list --internal -c Subnets -f value | tr -d "," | grep -v "^$"); do echo -e ".\c"; openstack $debug subnet delete $subnet; done
+  for subnet in $(openstack network list --internal -c Subnets -f value | tr -d "," | grep -v "^$"); do echo -e ".\c"; openstack $debug subnet delete $subnet || : ; done
 
   prompt "Deleting all routers"
-  for router in $(openstack router list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug router delete $router; done
+  for router in $(openstack router list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug router delete $router || : ; done
 
   prompt "Deleting all internal networks"
-  for network in $(openstack network list --internal -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug network delete $network; done
+  for network in $(openstack network list --internal -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug network delete $network || : ; done
 
   if [[ "$external_network_type" =~ ^(flat|vlan)$ ]]; then
     prompt "You've requested to re-create external network - Deleting all external networks and subnets"
-    for subnet in $(openstack subnet list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug subnet delete $subnet; done
-    for network in $(openstack network list --external -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug network delete $network; done
+    for subnet in $(openstack subnet list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug subnet delete $subnet || : ; done
+    for network in $(openstack network list --external -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug network delete $network || : ; done
   fi
 
   #prompt "Deleting all VM images"
-  #for img in $(openstack image list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug image delete $img; done
+  #for img in $(openstack image list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug image delete $img || : ; done
 
   #prompt "Deleting all VM flavors"
-  #for flavor in $(openstack flavor list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug flavor delete $flavor; done
+  #for flavor in $(openstack flavor list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug flavor delete $flavor || : ; done
 
   prompt "Deleting all security groups"
-  for secgroup in $(openstack security group list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug security group delete $secgroup; done
+  for secgroup in $(openstack security group list -c ID -f value | grep -v "^$"); do echo -e ".\c"; openstack $debug security group delete $secgroup || : ; done
 
   prompt "Deleting Tenant Project (test_cloud), User (tester), and Keypair (tester-key)"
   rm -rf $KEY_FILE
@@ -396,23 +401,14 @@ function run_cleanup() {
 
 # Evaluating general script options
 
-# When using -q / --quit option, the script will stop executing on first error
-if [[ -z "$quit_on_error" ]] || [[ "$quit_on_error" = YES ]]; then
-   prompt "Script will stop executing on the first error!"
-   set -e
-fi
-
 # When using -x / --trace option, the script will print each bash command before it is executed
+export -f trap_commands
 trap_commands;
 
-####################################################################################
-
-# Run Cleanup ONLY
-
-if [[ $cleanup_needed = ONLY ]]; then
-    prompt "Running CLEANUP only!"
-    run_cleanup;
-    exit 0
+# When using -q / --quit option, the script will stop executing on first error
+if [[ -z "$quit_on_error" ]] || [[ "$quit_on_error" = YES ]]; then
+  prompt "Script will stop executing on the first error!"
+  set -e
 fi
 
 ####################################################################################
@@ -433,14 +429,24 @@ fi
 
 cd /home/stack
 
-ENV_FILE=/home/stack/overcloudrc
-if [[ ! -f $ENV_FILE ]]; then
-    echo "Can't find \"overcloudrc\" environment file! Overcloud must be correctly deployed. Exiting."
-    exit 1
+ENV_FILE="/home/stack/overcloudrc"
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "Can't find \"overcloudrc\" environment file! Overcloud must be correctly deployed. Exiting."
+  exit 1
 else
   prompt "Switching to Overcloud with \"overcloudrc\". Please note that any previous configuration on Undercloud with \"stackrc\" will be ignored."
-    source $ENV_FILE
-    openstack endpoint list
+  source "$ENV_FILE"
+  openstack endpoint list
+fi
+
+####################################################################################
+
+# Run Cleanup ONLY
+
+if [[ $cleanup_needed = ONLY ]]; then
+  prompt "Running CLEANUP only!"
+  run_cleanup;
+  exit 0
 fi
 
 ####################################################################################
@@ -448,9 +454,9 @@ fi
 # Evaluating user input parameters
 
 # Getting VMs instances operating system image
-# [[ -z "$img_name" ]] && select img_name in rhel74 rhel75 rhel76 rhel80 cirros40 win2019; do [ -n "$img_name" ] && break; done
-while ! [[ "$img_name" =~ ^(rhel74|rhel75|rhel76|rhel80|cirros40|win2019)$ ]]; do
-  echo -e "\nWhich image do you want to use: rhel74 / rhel75 / rhel76 / rhel80 / cirros40 / win2019 ?"
+# [[ -z "$img_name" ]] && select img_name in rhel74 rhel75 rhel76 rhel80 cirros51 win2019; do [ -n "$img_name" ] && break; done
+while ! [[ "$img_name" =~ ^(rhel74|rhel75|rhel76|rhel80|cirros51|win2019)$ ]]; do
+  echo -e "\nWhich image do you want to use: rhel74 / rhel75 / rhel76 / rhel80 / cirros51 / win2019 ?"
   read -r img_name
 done
 
@@ -463,7 +469,7 @@ while ! [[ "$topology" =~ ^(mni|mvi)$ ]]; do
 done
 
 # Checking if external network exists
-ext_net=$(openstack network list --external -c Name -f value)
+ext_net="`openstack network list --external -c Name -f value`"
 if [[ -z "$ext_net" ]]; then
   echo -e "\n${RED}Warning: External network does NOT exist on Overcloud!${NO_COLOR}"
   if [[ "$external_network_type" =~ ^(skip)$ ]]; then
@@ -472,7 +478,7 @@ if [[ -z "$ext_net" ]]; then
   fi
 else
   echo -e "\n${YELLOW}External network exists:${NO_COLOR} $ext_net"
-  openstack network show $ext_net > EXT_NET.out
+  openstack network show "${ext_net}" > EXT_NET.out
   cat EXT_NET.out
   if [[ "$external_network_type" =~ ^(skip)$ ]]; then
     # External network EXISTS -> preserving it
@@ -567,7 +573,7 @@ fi
 if [[ $img_name = win2019 ]]; then
   # windows 2019 download
   prompt "Downloading Windows 2019 Image file - Recommended for Baremetal compute nodes only!"
-  download_file "${win_images_url}" "${WIN2019_IMG}"
+  download_file "${win_images_url}/${WIN2019_IMG}"
 
   # windows 2019 image
   prompt "Creating Windows 2019 Glance Image - Recommended for Baremetal compute nodes only!"
@@ -581,14 +587,14 @@ if [[ $img_name = win2019 ]]; then
 
 else
   # CirrOS Images
-  if [[ $img_name = cirros40 ]]; then
+  if [[ $img_name = cirros51 ]]; then
     # cirros download
     prompt "Downloading CirrOS 4.0.0 Image file"
-    download_file "${cirros40_images_url}" "${CIRROS40_IMG}"
+    download_file "${cirros51_images_url}/${CIRROS51_IMG}"
 
     # cirros image
     prompt "Creating CirrOS 4.0.0 Glance Image"
-    openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $CIRROS40_IMG
+    openstack image show $img_name || openstack $debug image create $img_name --container-format bare --disk-format qcow2 --public --file $CIRROS51_IMG
 
     # cirros flavor
     prompt "Creating CirrOS Flavor"
@@ -601,7 +607,7 @@ else
     if [[ $img_name = rhel74 ]]; then
       # rhel v7.4 download
       prompt "Downloading RHEL v7.4 Image file"
-      download_file "${rhel_images_url}" "${RHEL74_IMG}"
+      download_file "${rhel_images_url}/${RHEL74_IMG}"
 
       # rhel v7.4 image
       prompt "Creating RHEL v7.4 Glance Image"
@@ -611,7 +617,7 @@ else
       if [[ $img_name = rhel75 ]]; then
         # rhel v7.5 download
         prompt "Downloading RHEL v7.5 Image file"
-        download_file "${rhel_images_url}" "${RHEL75_IMG}"
+        download_file "${rhel_images_url}/${RHEL75_IMG}"
 
         # rhel v7.5 image
         prompt "Creating RHEL v7.5 Glance Image"
@@ -621,7 +627,7 @@ else
         if [[ $img_name = rhel76 ]]; then
           # rhel v7.6 download
           prompt "Downloading RHEL v7.6 Image file"
-          download_file "${rhel_images_url}" "${RHEL76_IMG}"
+          download_file "${rhel_images_url}/${RHEL76_IMG}"
 
           # rhel v7.6 image
           prompt "Creating RHEL v7.6 Glance Image"
@@ -631,7 +637,7 @@ else
           if [[ $img_name = rhel80 ]]; then
             # rhel v8.0 download
             prompt "Downloading RHEL v8.0 Image file"
-            download_file "${rhel_images_url}" "${RHEL80_IMG}"
+            download_file "${rhel_images_url}/${RHEL80_IMG}"
 
             # rhel v8.0 image
             prompt "Creating RHEL v8.0 Glance Image"
@@ -664,7 +670,7 @@ else
 fi
 
 # Getting external network name, and if it is not yet created, exiting with Error
-ext_net=$(openstack network list --external -c Name -f value)
+ext_net="$(openstack network list --external -c Name -f value)"
 
 if [[ -z "$ext_net" ]]; then
   echo -e "\n${PS1}Error: ${RED}External network was not created, exiting!${NO_COLOR}"
@@ -680,7 +686,7 @@ if [[ $tenant_enable = YES ]] ; then
   prompt "Creating Tenant user \"tester\" - a privileged user (non-admin)"
   openstack $debug project create test_cloud --enable
   openstack $debug user create tester --enable --password testerpass --project test_cloud
-  [[ $osp_version < 14 ]] && member_role=Member || member_role=member
+  [[ "${osp_version%.*}" -lt 14 ]] && member_role=Member || member_role=member
   openstack $debug role add $member_role --user tester --project test_cloud
   openstack user list
   openstack role list
@@ -770,7 +776,7 @@ done
 
 # Create external gateway
 prompt "Setting Router Gateway to the External Network \"$ext_net\""
-if [[ $osp_version > 10 ]]; then
+if [[ "${osp_version%.*}" -gt 10 ]]; then
   openstack $debug router set --external-gateway $ext_net $router_id
   #openstack $debug router set --external-gateway $ext_net $router_id --fixed-ip ip-address=10.35.141.93
 else
@@ -966,7 +972,7 @@ ssh -i $KEY_FILE ${ssh_user}@SERVER_FIP"
 # screen -r -d
 #
 # CirrOS VMs (2 instances) example:
-# ./create_multi_topology.sh -x -i cirros40 -t mvi --no-ipv6 -e skip -n 2 -v 2 -c YES
+# ./create_multi_topology.sh -x -i cirros51 -t mvi --no-ipv6 -e skip -n 2 -v 2 -c YES
 #
 # Windows VM (1 instance) example - Recommended for Baremetal compute nodes only:
 # ./create_multi_topology.sh -x -i win2019 -t mvi --no-ipv6 -e skip -n 1 -v 1 -c YES
