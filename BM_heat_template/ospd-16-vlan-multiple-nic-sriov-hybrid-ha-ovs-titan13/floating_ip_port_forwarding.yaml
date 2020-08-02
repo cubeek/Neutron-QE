@@ -1,0 +1,4 @@
+parameter_defaults:
+    ExtraConfig:
+        neutron::agents::l3::extensions: fip_qos,port_forwarding
+    NeutronServicePlugins: router,qos,segments,trunk,port_forwarding
