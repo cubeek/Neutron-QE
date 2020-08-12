@@ -18,7 +18,7 @@
             "mac":[
                 "f8:f2:1e:16:e4:02"
             ],
-            "name":"compute-1",
+            "name":"compute1-0",
             "cpu":"40",
             "memory":"262144",
             "disk":"250",
