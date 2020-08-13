@@ -111,4 +111,4 @@ parameter_defaults:
     NovaPCIPassthrough:
       - devname: "enp6s0f3"
         trusted: "true"
-        physical_network: "datacentre"
+        physical_network: "leaf"
