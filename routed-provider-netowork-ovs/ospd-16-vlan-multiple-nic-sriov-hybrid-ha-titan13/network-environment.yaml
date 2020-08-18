@@ -84,7 +84,6 @@ parameter_defaults:
 
   NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
   NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
-  NeutronPhysicalDevMappings: "datacentre:enp6s0f3,leaf:enp6s0f3"
   NeutronSupportedPCIVendorDevs: ['8086:1572']
   NeutronSriovNumVFs: ["enp6s0f3:5"]
   ComputeSriovParameters:
@@ -92,6 +91,7 @@ parameter_defaults:
     TunedProfileName: "cpu-partitioning"
     IsolCpusList: "2-23"
     NovaReservedHostMemory: 4096
+    NeutronPhysicalDevMappings: "datacentre:enp6s0f3"
     NeutronBridgeMappings:
     - datacentre:br-ext-int
     - tenant:br-int
@@ -105,6 +105,7 @@ parameter_defaults:
     TunedProfileName: "cpu-partitioning"
     IsolCpusList: "2-23"
     NovaReservedHostMemory: 4096
+    NeutronPhysicalDevMappings: "leaf:enp6s0f3"
     NeutronBridgeMappings:
     - leaf:br-ext-int
     - tenant-leaf:br-int
