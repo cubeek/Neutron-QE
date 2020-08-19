@@ -91,7 +91,8 @@ parameter_defaults:
     TunedProfileName: "cpu-partitioning"
     IsolCpusList: "2-23"
     NovaReservedHostMemory: 4096
-    NeutronPhysicalDevMappings: "datacentre:enp6s0f3"
+    NeutronPhysicalDevMappings: 
+    - datacentre:enp6s0f3
     NeutronBridgeMappings:
     - datacentre:br-ext-int
     - tenant:br-int
@@ -105,7 +106,8 @@ parameter_defaults:
     TunedProfileName: "cpu-partitioning"
     IsolCpusList: "2-23"
     NovaReservedHostMemory: 4096
-    NeutronPhysicalDevMappings: "leaf:enp6s0f3"
+    NeutronPhysicalDevMappings: 
+    - leaf:enp6s0f3
     NeutronBridgeMappings:
     - leaf:br-ext-int
     - tenant-leaf:br-int
