@@ -99,7 +99,6 @@ parameter_defaults:
     NovaPCIPassthrough:
       - devname: "enp6s0f3"
         trusted: "true"
-        physical_network: "datacentre"
 
   ComputeSriov1Parameters:
     KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
@@ -114,4 +113,3 @@ parameter_defaults:
     NovaPCIPassthrough:
       - devname: "enp6s0f3"
         trusted: "true"
-        physical_network: "leaf"
