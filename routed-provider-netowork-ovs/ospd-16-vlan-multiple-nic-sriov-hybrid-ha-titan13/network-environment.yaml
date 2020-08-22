@@ -98,6 +98,7 @@ parameter_defaults:
     - tenant:br-int
     NovaPCIPassthrough:
       - devname: "enp6s0f3"
+        physical_network: "datacentre"
         trusted: "true"
 
   ComputeSriov1Parameters:
@@ -112,4 +113,5 @@ parameter_defaults:
     - tenant-leaf:br-int
     NovaPCIPassthrough:
       - devname: "enp6s0f3"
+        physical_network: "datacentre"
         trusted: "true"
