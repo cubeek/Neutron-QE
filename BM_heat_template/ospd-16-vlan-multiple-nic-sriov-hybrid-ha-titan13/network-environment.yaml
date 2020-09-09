@@ -51,6 +51,7 @@ parameter_defaults:
   ControllerCount: 3
   ComputeSriovCount: 2
   NtpServer: clock.redhat.com
+  CloudDomain: redhat.local
 
  # Ironic mapping
   ControllerHostnameFormat: 'controller-%index%'
