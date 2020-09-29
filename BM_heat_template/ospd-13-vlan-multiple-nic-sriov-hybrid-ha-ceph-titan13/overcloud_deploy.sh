@@ -15,6 +15,8 @@ openstack -vvv overcloud deploy  \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
 -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ceph-titan13/l3_fip_qos.yaml \
+-e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml
+-e /usr/share/openstack-tripleo-heat-templates/environments/cinder-backup.yaml
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ceph-titan13/dns.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ceph-titan13/nova-resize-on-the-same-host.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ceph-titan13/network-environment.yaml \
