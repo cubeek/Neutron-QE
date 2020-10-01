@@ -1,0 +1,2 @@
+parameter_defaults:
+  CephPoolDefaultPgNum: 16
