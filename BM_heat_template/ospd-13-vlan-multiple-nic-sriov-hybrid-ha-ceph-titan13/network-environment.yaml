@@ -2,6 +2,7 @@ resource_registry:
   # Specify the relative/absolute path to the config files you want to use for override the default.
   OS::TripleO::ComputeSriov::Net::SoftwareConfig: nic-configs/compute.yaml
   OS::TripleO::Controller::Net::SoftwareConfig: nic-configs/controller.yaml
+  OS::TripleO::CephStorage::Net::SoftwareConfig: nic-configs/ceph.yaml
 parameter_defaults:
   #Enable isolated metadata for provider networks
   NeutronEnableIsolatedMetadata: 'True'
