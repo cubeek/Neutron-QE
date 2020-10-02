@@ -1,2 +1,22 @@
 parameter_defaults:
-  CephPoolDefaultPgNum: 16
+    CephAnsiblePlaybookVerbosity: 3
+    CinderEnableIscsiBackend: false
+    CinderEnableRbdBackend: true
+    CinderEnableNfsBackend: false
+    NovaEnableRbdBackend: true
+    GlanceBackend: rbd
+    CinderRbdPoolName: "volumes"
+    NovaRbdPoolName: "vms"
+    GlanceRbdPoolName: "images"
+    CephPoolDefaultPgNum: 32
+    CephAnsibleDisksConfig:
+        devices:
+            - '/dev/vdb'
+            - '/dev/vdc'
+            - '/dev/vdd'
+            - '/dev/vde'
+            - '/dev/vdf'
+        osd_scenario: lvm
+        osd_objectstore: bluestore
+ 
+        journal_size: 512
