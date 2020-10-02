@@ -7,7 +7,10 @@ cd /home/stack
 source overcloudrc
 for vm in $(openstack server list -c ID -f value | grep -v "^$"); do openstack server delete $vm; done
 router_id=$(openstack router list -c ID -f value | head -1)
-for fip in $(openstack floating ip list -c ID -f value | grep -v "^$"); do openstack floating ip delete $fip; done
+for fip in $(openstack floating ip list -c ID -f value | grep -v "^$"); do \
+    for fip_pf in $(openstack floating ip port forwarding list $fip -c ID -f value | grep -v "^$"); do \
+        openstack floating ip port forwarding delete $fip $fip_pf; done
+    openstack floating ip delete $fip; done
 for router in $(openstack router list -c ID -f value | grep -v "^$"); do openstack router unset --external-gateway $router; done
 for router in $(openstack router list -c ID -f value | grep -v "^$"); do neutron router-gateway-clear $router; done
 for subnet in $(openstack subnet list -c ID -f value | grep -v "^$"); do openstack router remove subnet $router_id $subnet; done
