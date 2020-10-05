@@ -80,3 +80,4 @@ parameter_defaults:
     TunedProfileName: "cpu-partitioning"
     IsolCpusList: "2-23"
     NovaReservedHostMemory: 4096
+  NeutronDebug: True
