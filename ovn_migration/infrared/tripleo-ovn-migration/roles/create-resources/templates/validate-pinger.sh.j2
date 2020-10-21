@@ -1,0 +1,20 @@
+#!/bin/bash
+set -x
+
+: ${LOSS_THRESHOLD_PERCENT:=1}
+
+validate(){
+    PING_RESULT=$( grep 'packet loss' $1 | sed 's/.*,\s\(.*\)%.*$/\1/' )
+
+    if [ $(echo "${PING_RESULT} > ${LOSS_THRESHOLD_PERCENT}" | bc ) -ne 0 ]; then
+        LC_NUMERIC=C \
+                  printf "$1: Ping loss higher than %.0f %% detected (%.0f %%)\n" \
+                  ${LOSS_THRESHOLD_PERCENT} ${PING_RESULT}
+        exit 1
+    fi
+    echo "$1: Passed validation"
+}
+
+for file in `ls  {{ ovn_migration_temp_dir }}/*ping.out`; do
+    validate $file
+done
