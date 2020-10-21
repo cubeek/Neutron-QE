@@ -9,7 +9,7 @@
             "memory":"65536",
             "disk":"120",
             "arch":"x86_64",
-            "pm_type":"pxe_ipmitool",
+            "pm_type":"ipmi",
             "pm_user":"root",
             "pm_password":"calvin",
             "pm_addr":"10.35.160.184"
@@ -23,7 +23,7 @@
             "memory":"65536",
             "disk":"120",
             "arch":"x86_64",
-            "pm_type":"pxe_ipmitool",
+            "pm_type":"ipmi",
             "pm_user":"root",
             "pm_password":"calvin",
             "pm_addr":"10.35.160.194"
