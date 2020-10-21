@@ -22,7 +22,7 @@
         when:
             - not deploy_file.stat.exists|bool
             - deploy_file_2.stat.exists|bool
-            
+
       - name: Check if overcloud_upgrade_prepare.sh is present
         stat:
             path: ~/overcloud_upgrade_prepare.sh
@@ -32,14 +32,14 @@
       - name: Set the ml2ovs overcloud deploy script file name
         set_fact:
             overcloud_deploy_script: '~/overcloud_upgrade_prepare.sh'
-        when: 
+        when:
             - is_after_ffu|bool
             - upgrade_prepare_file.stat.exists|bool
 
       - name: Copy overcloud deploy script to overcloud-deploy-ovn.sh
         command: cp -f {{ overcloud_deploy_script }}  ~/overcloud-deploy-ovn.sh
         when: infrared_deployment|bool
-        
+
 - name: set overcloud deploy ovn script
   set_fact:
       overcloud_deploy_ovn_script: '~/overcloud-deploy-ovn.sh'
@@ -102,7 +102,7 @@
       - infrared_deployment|bool
       - not is_sriov|bool
       - is_after_ffu|bool
-     
+
 - name: Construct overcloud-deploy-ovn.sh script for infrared deployments (SR-IOV)
   lineinfile:
       dest: "{{ overcloud_deploy_ovn_script }}"
@@ -133,7 +133,7 @@
   when:
       - infrared_deployment|bool
       - is_sriov|bool
-      - is_after_ffu|bool 
+      - is_after_ffu|bool
 
 - name: Create neutron_bridge_mappings.yaml file
   shell: |
@@ -153,7 +153,7 @@
       - infrared_deployment|bool
       - is_sriov|bool
 
-- name: Set roles data file for infrared SR-IOV deployments 
+- name: Set roles data file for infrared SR-IOV deployments
   set_fact:
       roles_data_file: "{{ shell_output.stdout }}"
   when:
@@ -167,7 +167,7 @@
       - is_sriov|bool
       - not is_after_ffu|bool
 
-- name: Adjust roles data file for infrared SR-IOV deployments ater FFU
+- name: Adjust roles data file for infrared SR-IOV deployments arter FFU
   command: awk -i inplace '/OVNController/ {f=1; print; next} f && !/OVNMetadataAgent/ {print "  - OS::TripleO::Services::OVNMetadataAgent"} { f = 0; print }  ' {{ roles_data_file }}
   when:
       - infrared_deployment|bool
@@ -175,7 +175,7 @@
       - is_after_ffu|bool
 
 - name: Adjust overcloud-deploy-ovn.sh script for after_ffu environments
-  command: sed -i  -e 's/upgrade\ prepare/deploy/' "{{ overcloud_deploy_ovn_script }}" 
+  command: sed -i  -e 's/upgrade\ prepare/deploy/' "{{ overcloud_deploy_ovn_script }}"
   when:
       - infrared_deployment|bool
       - is_after_ffu|bool
@@ -197,7 +197,7 @@
       mode: 0744
   when:
       - not infrared_deployment|bool
-      
+
 - name: Set image tag (infrared deployment)
   block:
       - name: Get puddle version

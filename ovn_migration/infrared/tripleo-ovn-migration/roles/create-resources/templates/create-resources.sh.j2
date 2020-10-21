@@ -73,12 +73,11 @@ launch_normal_int_instances(){
         [ "$num_hypervisors" == "1" ] && index_suffix="" || index_suffix="-$i"
         openstack port create  --network ovn-migration-net-{{ resource_suffix }} --vnic-type normal ovn-migration-port-normal-int-{{ resource_suffix }}$index_suffix --security-group ovn-migration-sg-{{ resource_suffix }}
 
-    openstack server create --flavor ovn-migration-{{ resource_suffix }} --image $image_name \
-    --key-name ovn-migration-{{ resource_suffix }} \
-    --nic port-id=ovn-migration-port-normal-int-{{ resource_suffix }}$index_suffix \
-    --security-group ovn-migration-sg-{{ resource_suffix }} \
-    ovn-migration-server-normal-int-{{ resource_suffix }}$index_suffix
-    
+        openstack server create --flavor ovn-migration-{{ resource_suffix }} --image $image_name \
+        --key-name ovn-migration-{{ resource_suffix }} \
+        --nic port-id=ovn-migration-port-normal-int-{{ resource_suffix }}$index_suffix \
+        --security-group ovn-migration-sg-{{ resource_suffix }} \
+        ovn-migration-server-normal-int-{{ resource_suffix }}$index_suffix
     done
 }
 
@@ -88,13 +87,11 @@ launch_normal_ext_instances(){
         [ "$num_hypervisors" == "1" ] && index_suffix="" || index_suffix="-$i"
         openstack port create  --network {{ public_network_name }} --vnic-type normal ovn-migration-port-normal-ext-{{ resource_suffix }}$index_suffix --security-group ovn-migration-sg-{{ resource_suffix }}
 
-
-    openstack server create --flavor ovn-migration-{{ resource_suffix }} --image $image_name \
-    --key-name ovn-migration-{{ resource_suffix }} \
-    --nic port-id=ovn-migration-port-normal-ext-{{ resource_suffix }}$index_suffix \
-    --security-group ovn-migration-sg-{{ resource_suffix }} \
-    ovn-migration-server-normal-ext-{{ resource_suffix }}$index_suffix
-    
+        openstack server create --flavor ovn-migration-{{ resource_suffix }} --image $image_name \
+        --key-name ovn-migration-{{ resource_suffix }} \
+        --nic port-id=ovn-migration-port-normal-ext-{{ resource_suffix }}$index_suffix \
+        --security-group ovn-migration-sg-{{ resource_suffix }} \
+        ovn-migration-server-normal-ext-{{ resource_suffix }}$index_suffix
     done
 }
 
@@ -266,7 +263,7 @@ do
         done
 
         echo "VM is up and the port is ACTIVE"
-    
+
         if [[ "$type_suffix" =~ "ext" ]]; then
 	        server_ip=`openstack port list | grep $type_suffix-{{ resource_suffix }}$index_suffix | sed "s/.*ip_address='\([.0-9]*\).*/\1/"`
         else

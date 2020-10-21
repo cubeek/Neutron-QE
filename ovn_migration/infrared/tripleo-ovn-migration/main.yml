@@ -22,7 +22,7 @@
               - bc
             state: present
         when: python_major_version | int == 3
-        
+
       - name: Set host_key_checking to False in ansible.cfg
         ini_file:
             path=/etc/ansible/ansible.cfg
@@ -30,13 +30,13 @@
             option=host_key_checking
             value=False
         ignore_errors: yes
-        
+
       - name: Download updated ovn_migration.sh, temp fix
         get_url:
             url: http://file.tlv.redhat.com/~rsafrono/files/ovn_migration.sh
             dest: /home/stack/ovn_migration.sh
             mode: '0755'
-        
+
       - name: Update local ovn_migration.sh script, temp fix
         command: cp -f /home/stack/ovn_migration.sh /usr/bin
 
@@ -70,7 +70,7 @@
             is_dvr: "{{ dvr }}"
             is_sriov: "{{ sriov }}"
         when: install is not defined
-        
+
       - name: Set overcloudrc
         set_fact:
             overcloudrc: "/home/stack/{{ stack_name }}rc"
@@ -171,20 +171,20 @@
 
             - name: Fail if resources_type is dvr while environment is SR-IOV
               fail:
-                  msg: "SR-IOV does not support dvr resources" 
-              when:                  
+                  msg: "SR-IOV does not support dvr resources"
+              when:
                   - resources_type == 'dvr' and is_sriov|bool
-                  
+
             - name: Fail if resources_type is dvr while target environment is not DVR
               fail:
-                  msg: "DVR resources can be run only on DVR environment" 
-              when:                 
+                  msg: "DVR resources can be run only on DVR environment"
+              when:
                   - resources_type == 'dvr' and not is_dvr|bool
-                  
-            - name: Fail if resources_type is sriov* while environment is not SR-IOV 
+
+            - name: Fail if resources_type is sriov* while environment is not SR-IOV
               fail:
-                  msg: "This resource type can be used only with SR-IOV" 
-              when:                 
+                  msg: "This resource type can be used only with SR-IOV"
+              when:
                   - resources_type is regex("sriov.*") and not is_sriov|bool
 
             - name: Create resources
@@ -196,7 +196,6 @@
                   ovn_migration_temp_dir: /home/stack/ovn_migration
                   dvr: is_dvr|bool
                   sriov: is_sriov|bool
-                  
         when:
             - create_vms|bool
 
@@ -222,7 +221,7 @@
               set_fact:
                   public_network: "{{ external_network }}"
               when: install is not defined
-              
+
             - name: Set compute external access fact (infrared deployment)
               set_fact:
                   compute_external_access: "{{ install.compute_external_access }}"
@@ -263,14 +262,14 @@
             - name: Stop pinger if started
               shell:
                   echo "exit" > {{ ovn_migration_working_dir }}/_pinger_cmd.txt
-                  
+
             - name: Validate pinger results if exist
               shell:
                   set -o pipefail &&
                   {{ ovn_migration_working_dir }}/validate-pinger.sh 2>&1
                   > {{ ovn_migration_working_dir }}/validate-pinger.sh.log
               when: create_vms|bool
-                  
+
         always:
             - name: Fetch ovn_migration log directory
               synchronize:

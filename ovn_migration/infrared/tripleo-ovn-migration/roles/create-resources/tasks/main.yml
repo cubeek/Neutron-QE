@@ -26,7 +26,7 @@
     src: start-pinger.sh.j2
     dest: "{{ ovn_migration_temp_dir }}/start-pinger.sh"
     mode: 0744
-    
+
 - name: Generate pinger validation script
   template:
     src: validate-pinger.sh.j2
