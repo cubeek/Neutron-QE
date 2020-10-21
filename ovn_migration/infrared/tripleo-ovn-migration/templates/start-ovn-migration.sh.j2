@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export PUBLIC_NETWORK_NAME={{ public_network }}
+# TODO: Get this from the var
+export OPT_WORKDIR=/home/stack/ovn_migration
+export STACK_NAME={{ stack_name }}
+export OVERCLOUDRC_FILE={{ overcloudrc }}
+export COMPUTE_EXTERNAL_ACCESS={{ compute_external_access }}
+
+/usr/bin/ovn_migration.sh $1
