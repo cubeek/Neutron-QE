@@ -3,6 +3,15 @@ set -x
 
 : ${LOSS_THRESHOLD_PERCENT:=1}
 
+check_if_pinger_stopped(){
+    wait_time=10;
+    until grep 'packet loss' $file; do
+        sleep 1
+        wait_time=$((wait_time-1))
+        [ $wait_time -eq 0 ] && echo "Can't find ping result summary in the pinger log"  && exit 1
+    done
+}
+
 validate(){
     PING_RESULT=$( grep 'packet loss' $1 | sed 's/.*,\s\(.*\)%.*$/\1/' )
 
@@ -15,6 +24,10 @@ validate(){
     echo "$1: Passed validation"
 }
 
-for file in `ls  {{ ovn_migration_temp_dir }}/*ping.out`; do
+file_list=`ls {{ ovn_migration_temp_dir }}/*ping.out`
+[ "$file_list" == "" ] && echo "No pinger log files found. Something went wrong." && exit 1
+
+for file in $file_list; do
+    check_if_pinger_stopped $file
     validate $file
 done

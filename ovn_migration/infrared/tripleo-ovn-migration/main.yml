@@ -1,4 +1,13 @@
 # Playbook which preps migration and then invokes the migration script.
+
+# migration_result will be set to 'false' until it is updated at the end
+# to 'passed' in case all worked as expected. This will be used by CI.
+- name: Set result file
+  hosts: undercloud
+  tasks:
+     - name: Set result to failed until we reach the end
+       shell: echo "failed" > /home/stack/migration_result
+
 - name: Install migration tool
   hosts: undercloud
   become: true
@@ -269,6 +278,9 @@
                   {{ ovn_migration_working_dir }}/validate-pinger.sh 2>&1
                   > {{ ovn_migration_working_dir }}/validate-pinger.sh.log
               when: create_vms|bool
+
+            - name: Set result file to passed
+              shell: echo "passed" > /home/stack/migration_result
 
         always:
             - name: Fetch ovn_migration log directory
