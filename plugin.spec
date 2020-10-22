@@ -65,12 +65,12 @@ subparsers:
                       type: Bool
                       help: If the deployment is to be dvr or not
                       default: False
-                      
+
                   sriov:
                       type: Bool
                       help: If the environment uses SR-IOV
                       default: False
-                      
+
                   after_ffu:
                       type: Bool
                       help: If the environment is after Fast Forward Upgrade
@@ -80,7 +80,7 @@ subparsers:
                       type: Bool
                       help: Create resources to measure downtime
                       default: True
-                      
+
                   resources_type:
                       type: Value
                       help: |
@@ -106,7 +106,7 @@ subparsers:
                       type: Value
                       help: External network name to use
                       default: public
-                      
+
                   compute_external_access:
                       type: Bool
                       help: Whether compute nodes have access to the external network (i.e. external interface is under br-ex bridge).
@@ -116,13 +116,18 @@ subparsers:
                       type: Value
                       help: Image name to use
                       default: cirros-0.4.0-x86_64-disk.img
-                      
+
                   server_user_name:
                       type: Value
                       help: User name to use for login to the resources VMs
-                      default: cirros                 
-                      
+                      default: cirros
+
                   stack_name:
                       type: Value
                       help: Name of the stack to update
                       default: overcloud
+
+                  jumbo_mtu:
+                      type: Bool
+                      help: Whether target environment should support jumbo MTU.
+                      default: False

@@ -71,6 +71,7 @@
             stack_name: "{{ install.stack_name }}"
             is_dvr: "{{ install.dvr }}"
             is_sriov: "{{ install.sriov }}"
+            support_jumbo_mtu: "{{ install.jumbo_mtu }}"
         when: install is defined
 
       - name: Set necessary facts (Tripleo deployment)
@@ -78,6 +79,7 @@
             stack_name: "{{ stack_name }}"
             is_dvr: "{{ dvr }}"
             is_sriov: "{{ sriov }}"
+            support_jumbo_mtu: "{{ jumbo_mtu }}"
         when: install is not defined
 
       - name: Set overcloudrc

@@ -143,6 +143,15 @@
       echo "  NeutronBridgeMappings: \"$current_mappings\"" >> /home/stack/neutron_bridge_mappings.yaml
   when: infrared_deployment|bool
 
+- name: Add settings for Jumbo MTU
+  shell: |
+      echo "  OVNEmitNeedToFrag: True" >> /home/stack/neutron_bridge_mappings.yaml
+      echo "  ExtraConfig:" >> /home/stack/neutron_bridge_mappings.yaml
+      echo "    neutron::plugins::ml2::ovn::ovn_emit_need_to_frag: True" >> /home/stack/neutron_bridge_mappings.yaml
+  when:
+      - infrared_deployment|bool
+      - support_jumbo_mtu|bool
+
 - name: Get roles data file for infrared SR-IOV deployments
   shell: |
       roles_file=$(grep '\-r\ ' /home/stack/overcloud-deploy-ovn.sh | sed 's/.*-r\ \(.*\)\ .*/\1/')
