@@ -1,0 +1,32 @@
+{
+    "nodes":[
+        {
+            "mac":[
+                "f8:f2:1e:15:a8:82"
+            ],
+            "name":"compute-0",
+            "cpu":"40",
+            "memory":"262144",
+            "disk":"250",
+            "arch":"x86_64",
+            "pm_type":"ipmi",
+            "pm_user":"root",
+            "pm_password":"calvin",
+            "pm_addr":"10.46.2.73"
+        },
+        {
+            "mac":[
+                "f8:f2:1e:16:df:c2"
+            ],
+            "name":"compute-1",
+            "cpu":"40",
+            "memory":"262144",
+            "disk":"250",
+            "arch":"x86_64",
+            "pm_type":"ipmi",
+            "pm_user":"root",
+            "pm_password":"calvin",
+            "pm_addr":"10.46.2.74"
+        }
+    ]
+}
