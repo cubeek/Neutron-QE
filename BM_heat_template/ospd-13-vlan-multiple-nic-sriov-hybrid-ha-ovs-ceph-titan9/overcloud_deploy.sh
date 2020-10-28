@@ -22,5 +22,5 @@ openstack -vvv overcloud deploy  \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-ceph-titan9/network-environment.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-ceph-titan9/docker-images.yaml \
 -e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-ceph-titan9/os-net-config-mappings.yaml \
--e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ceph-titan9/ceph.yaml \
+-e /home/stack/ospd-13-vlan-multiple-nic-sriov-hybrid-ha-ovs-ceph-titan9/ceph.yaml \
 --log-file overcloud_install.log &> overcloud_install.log
