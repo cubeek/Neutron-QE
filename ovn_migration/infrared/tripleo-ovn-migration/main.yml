@@ -284,10 +284,10 @@
             - name: Set result file to passed
               shell: echo "passed" > /home/stack/migration_result
 
-        always:
-            - name: Fetch ovn_migration log directory
-              synchronize:
-                  src: "{{ ovn_migration_working_dir }}"
-                  dest: "{{ inventory_dir }}"
-                  mode: pull
-              when: install is defined
+#        always:
+#            - name: Fetch ovn_migration log directory
+#              synchronize:
+#                  src: "{{ ovn_migration_working_dir }}"
+#                  dest: "{{ inventory_dir }}"
+#                  mode: pull
+#              when: install is defined
