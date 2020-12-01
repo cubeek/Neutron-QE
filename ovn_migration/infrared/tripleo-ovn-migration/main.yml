@@ -252,23 +252,23 @@
             - name: Generate inventory file for ovn migration
               shell:
                   set -o pipefail &&
-                  {{ ovn_migration_working_dir }}/start-ovn-migration.sh generate-inventory 2>&1 > {{ ovn_migration_working_dir }}/generate-inventory.log
+                  {{ ovn_migration_working_dir }}/start-ovn-migration.sh generate-inventory > {{ ovn_migration_working_dir }}/generate-inventory.log 2>&1
 
             - name: Set MTU T1
               shell:
                   set -o pipefail &&
-                  {{ ovn_migration_working_dir }}/start-ovn-migration.sh setup-mtu-t1 2>&1 > {{ ovn_migration_working_dir }}/setup-mtu-t1.log
+                  {{ ovn_migration_working_dir }}/start-ovn-migration.sh setup-mtu-t1 > {{ ovn_migration_working_dir }}/setup-mtu-t1.log 2>&1
 
             - name: Reduce mtu of the pre migration networks
               shell:
                   set -o pipefail &&
-                  {{ ovn_migration_working_dir }}/start-ovn-migration.sh reduce-mtu 2>&1 > {{ ovn_migration_working_dir }}/reduce-mtu.log
+                  {{ ovn_migration_working_dir }}/start-ovn-migration.sh reduce-mtu > {{ ovn_migration_working_dir }}/reduce-mtu.log 2>&1
 
             - name: Start the migration process
               shell:
                   set -o pipefail &&
-                  {{ ovn_migration_working_dir }}/start-ovn-migration.sh start-migration 2>&1
-                  > {{ ovn_migration_working_dir }}/start-ovn-migration.sh.log
+                  {{ ovn_migration_working_dir }}/start-ovn-migration.sh start-migration
+                  > {{ ovn_migration_working_dir }}/start-ovn-migration.sh.log 2>&1
 
             - name: Stop pinger if started
               shell:
@@ -277,8 +277,8 @@
             - name: Validate pinger results if exist
               shell:
                   set -o pipefail &&
-                  {{ ovn_migration_working_dir }}/validate-pinger.sh 2>&1
-                  > {{ ovn_migration_working_dir }}/validate-pinger.sh.log
+                  {{ ovn_migration_working_dir }}/validate-pinger.sh
+                  > {{ ovn_migration_working_dir }}/validate-pinger.sh.log 2>&1
               when: create_vms|bool
 
             - name: Set result file to passed
