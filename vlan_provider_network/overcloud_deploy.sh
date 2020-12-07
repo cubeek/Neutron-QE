@@ -6,4 +6,4 @@ openstack overcloud deploy \
     --libvirt-type kvm \
     --stack overcloud \
     -r /home/stack/vlan_provider_network/roles/roles_data.yaml \
-    -n /home/stack/vlan_provider_network/roles/network-config.yaml \
+    -n /home/stack/vlan_provider_network/network/network-config.yaml

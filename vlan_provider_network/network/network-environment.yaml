@@ -1,6 +1,5 @@
 ---
 parameter_defaults:
-{% if not install.network.render.templates|default(False) %}
     ExternalNetCidr: '10.218.0.0/24'
     ExternalAllocationPools: [{'start': '10.218.0.101', 'end': '10.218.0.149'}]
     ExternalInterfaceDefaultRoute: '10.218.0.10'
@@ -18,23 +17,10 @@ parameter_defaults:
     TenantNetCidr: '172.17.2.0/24'
     TenantAllocationPools: [{'start': '172.17.2.10', 'end': '172.17.2.149'}]
     TenantNetworkVlanID: 50
-{% endif %}
     DnsServers: ['10.218.0.5', '172.16.0.1']
-{% if install.splitstack|default(False) %}
-    ControlPlaneDefaultRoute: {{ ansible_host|default(ansible_ssh_host) }}
-    EC2MetadataIp: {{ ansible_host|default(ansible_ssh_host) }}
-{% else %}
     ControlPlaneDefaultRoute: 192.168.24.1
     EC2MetadataIp: 192.168.24.1
-{% endif %}
     ControlPlaneSubnetCidr: "24"
-{% if not (install.ntp.pool|default(False) and install.version|openstack_release >= 15) %}
     NtpServer: ["clock1.rdu2.redhat.com"]
-{% endif %}
     NeutronBridgeMappings: "datacentre:br-ex,tenant:br-isolated"
     NeutronNetworkVLANRanges: "tenant:1000:2000,datacentre:218:218"
-{% if install.storage.protocol.backend == 'nfs-ganesha' %}
-    StorageNFSNetCidr: '172.17.5.0/24'
-    StorageNFSNetworkVlanID: 70
-    StorageNFSAllocationPools: [{'start': '172.17.5.10', 'end': '172.17.5.149'}]
-{% endif %}
