@@ -17,7 +17,7 @@ parameter_defaults:
     TenantNetCidr: '172.17.2.0/24'
     TenantAllocationPools: [{'start': '172.17.2.10', 'end': '172.17.2.149'}]
     TenantNetworkVlanID: 50
-    DnsServers: ['10.218.0.5', '172.16.0.1']
+    DnsServers: ['10.218.0.5', '172.16.0.1', '10.44.6.1']
     ControlPlaneDefaultRoute: 192.168.24.1
     EC2MetadataIp: 192.168.24.1
     ControlPlaneSubnetCidr: "24"
