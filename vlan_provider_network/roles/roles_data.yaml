@@ -9,6 +9,7 @@
     Basic Compute Node role
   CountDefault: 1
   networks:
+    - External
     - InternalApi
     - Tenant
     - Storage
@@ -258,6 +259,7 @@
   description: |
     Standalone networking role to run Neutron agents on their own.
   networks:
+    - External
     - InternalApi
     - Tenant
   HostnameFormatDefault: "networker-%index%"
