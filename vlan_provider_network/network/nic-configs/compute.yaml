@@ -13,6 +13,10 @@ parameters:
     default: ''
     description: IP address/subnet on the external network
     type: string
+  ExternalInterfaceDefaultRoute:
+    default: '10.0.0.1'
+    description: default route for the external network
+    type: string
   InternalApiIpSubnet:
     default: ''
     description: IP address/subnet on the internal API network
@@ -147,14 +151,6 @@ resources:
                               -
                                 ip_netmask:
                                     get_param: TenantIpSubnet
-                              routes:
-                                -
-                                  ip_netmask: 0.0.0.0/0
-                                  next_hop:
-                                      get_param: ExternalInterfaceDefaultRoute
-
-                                  # Optionally have this interface as default route
-                                  default: true
 
                         -
                           type: ovs_bridge
@@ -171,6 +167,17 @@ resources:
                             - type: vlan
                               vlan_id:
                                 get_param: ExternalNetworkVlanID
+                              addresses:
+                                - ip_netmask:
+                                    get_param: ExternalIpSubnet
+                              routes:
+                                -
+                                  ip_netmask: 0.0.0.0/0
+                                  next_hop:
+                                      get_param: ExternalInterfaceDefaultRoute
+
+                                  # Optionally have this interface as default route
+                                  default: true
 
 outputs:
   OS::stack_id:

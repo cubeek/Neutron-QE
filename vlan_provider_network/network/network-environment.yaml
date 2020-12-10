@@ -18,8 +18,8 @@ parameter_defaults:
     TenantAllocationPools: [{'start': '172.17.2.10', 'end': '172.17.2.149'}]
     TenantNetworkVlanID: 50
     DnsServers: ['10.0.0.1', '172.16.0.1']
-    ControlPlaneDefaultRoute: 192.168.24.1
-    EC2MetadataIp: 192.168.24.1
+    ControlPlaneDefaultRoute: '192.168.24.1'
+    EC2MetadataIp: '192.168.24.1'
     ControlPlaneSubnetCidr: "24"
     NtpServer: ["clock1.rdu2.redhat.com"]
     NeutronBridgeMappings: "datacentre:br-ex,tenant:br-isolated"
