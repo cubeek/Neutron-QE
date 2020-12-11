@@ -3,4 +3,4 @@ parameter_defaults:
     DnsServers: ['10.0.0.1', '172.16.0.1']
     NtpServer: ["clock1.rdu2.redhat.com"]
     NeutronBridgeMappings: "datacentre:br-ex,tenant:br-isolated"
-    NeutronNetworkVLANRanges: "tenant:1000:2000,datacentre:21i8:218"
+    NeutronNetworkVLANRanges: "tenant:1000:2000,datacentre:218:218"
