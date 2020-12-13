@@ -1,0 +1,61 @@
+#!/bin/bash
+set -x
+. {{ overcloudrc }}
+
+echo Deleting floating ip addresses
+for fip in $(openstack floating ip list -c ID -c Name -f value | grep migration | cut -d ' ' -f 1); do
+  echo Deleting fip with id $fip
+  openstack floating ip delete $fip
+done
+
+echo Deleting servers
+for server in $(openstack server list --all -c ID -c Name -f value | grep migration | cut -d ' ' -f 1); do
+  echo Deleting server with id $server
+  openstack server delete $server
+done
+
+for port in $(openstack port list -c ID -c Name -f value | grep migration | cut -d ' ' -f 1); do
+  echo Deleting ports created for migration workload
+  openstack port delete $port
+done
+
+for keypair in $(openstack keypair list -c ID -c Name -f value | grep migration | cut -d ' ' -f 1); do
+  echo Deleting keypairs created for migration workload
+  openstack keypair delete $keypair
+done
+
+for flavor in $(openstack flavor list -c ID -c Name -f value | grep migration | cut -d ' ' -f 1); do
+  echo Deleting flavors created for migration workload
+  openstack flavor delete $flavor
+done
+
+for image in $(openstack image list -c ID -c Name -f value | grep migration | cut -d ' ' -f 1); do
+  echo Deleting images created for migration workload
+  openstack image delete $image
+done
+
+for sg in $(openstack security group list -c ID -c Name -f value | grep migration | cut -d ' ' -f 1); do
+  echo Deleting rules from security group $sg
+  for rule in $(openstack security group show $sg | grep 'id=' | grep -v location | grep -o 'id='.*'' | cut -d ' ' -f 1 | sed "s/id='\(.*\)'/\1/" | tr -d ',');do
+    openstack security group rule delete $rule
+  done
+  openstack security group delete $sg
+done
+
+echo Disconnecting routers from external network and subnets from routers
+for router in $(openstack router list -c ID -c Name -f value | grep migration | cut -d ' ' -f 1); do
+  echo Disconnecting router with id $router from external gateway
+  openstack router unset --external-gateway $router
+  for subnet in $(openstack router show $router -c interfaces_info -f value | tr -d "[]{' "  | tr "}" "\n" | grep -v 169.254 | tr "," "\n"  | grep subnet_id | tr -d '"'  |  sed 's/.*subnet_id:\(.*\)/\1/' | sed '/^$/d' );do
+    echo Disconnecting subnet with id $subnet from router with id $router
+    openstack router remove subnet $router $subnet
+  done
+  echo Deleting router with id $router
+  openstack router delete $router
+done
+
+echo Deleting networks
+for net in $(openstack network list --internal -c ID -c Name -f value | grep migration | cut -d ' ' -f 1); do
+  echo Deleting network with id $net
+  openstack network delete $net
+done

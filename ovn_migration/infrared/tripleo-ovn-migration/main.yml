@@ -284,6 +284,18 @@
             - name: Set result file to passed
               shell: echo "passed" > /home/stack/migration_result
 
+            - name: Create resources cleanup script
+              template:
+                  src: templates/delete-resources.sh.j2
+                  dest: "{{ ovn_migration_working_dir }}/delete-resources.sh"
+                  mode: 0755
+
+            - name: Run resources cleanup script
+              shell:
+                  set -o pipefail &&
+                  {{ ovn_migration_working_dir }}/delete-resources.sh
+                  > {{ ovn_migration_working_dir }}/delete-resources.sh.log 2>&1
+
 #        always:
 #            - name: Fetch ovn_migration log directory
 #              synchronize:
