@@ -24,3 +24,5 @@ parameter_defaults:
     NtpServer: ["clock1.rdu2.redhat.com"]
     NeutronBridgeMappings: "datacentre:br-ex,tenant:br-isolated"
     NeutronNetworkVLANRanges: "tenant:1000:2000,datacentre:218:218"
+    NeutronNetworkType: ['vlan','vxlan']
+    NeutronTypeDrivers: 'vxlan,vlan,flat,gre'
