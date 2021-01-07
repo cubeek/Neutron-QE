@@ -35,9 +35,7 @@ parameter_defaults:
   ExternalNetworkVlanID: 319
 
   DnsServers: ["10.46.0.31","10.46.0.32"]
-  NeutronExternalNetworkBridge: "''"
   NeutronNetworkType: 'vlan,flat'
-  #OVNTunnelEncapType: 'vlan'
   NeutronTunnelTypes: ''
   NeutronBridgeMappings: 'datacentre:br-ext-int,tenant:br-int'
   NeutronNetworkVLANRanges: 'datacentre:319:319,datacentre:321:324,datacentre:354:368'
@@ -60,8 +58,6 @@ parameter_defaults:
 
 
 #### Extras ####
-  #NeutronMechanismDrivers: ['sriovnicswitch', 'openvswitch']
-  NeutronMechanismDrivers: "ovn,sriovnicswitch"
   NovaPCIPassthrough:
     - devname: "enp6s0f3"
       trusted: "true"
@@ -70,8 +66,6 @@ parameter_defaults:
       trusted: "true"
       physical_network: "datacentre"
 
-  NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
-  NovaSchedulerDefaultFilters: ['AvailabilityZoneFilter','ComputeFilter','ComputeCapabilitiesFilter','ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
   NeutronPhysicalDevMappings: "datacentre:enp6s0f3,datacentre:enp7s0f3"
   NeutronSupportedPCIVendorDevs: ['8086:154c', '8086:1572']
   NeutronSriovNumVFs: ["enp6s0f3:5", "enp7s0f3:5"]
