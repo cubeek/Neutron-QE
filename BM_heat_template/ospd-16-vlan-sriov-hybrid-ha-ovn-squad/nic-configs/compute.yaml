@@ -241,10 +241,19 @@ resources:
                 hotplug: true
                 numvfs: 5
 
+              - type: sriov_pf
+                name: nic5
+                use_dhcp: false
+                defroute: false
+                nm_controlled: true
+                hotplug: true
+                numvfs: 5
+
               - type: ovs_bridge
                 name: br-int
                 use_dhcp: false
                 device: nic2
+
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.

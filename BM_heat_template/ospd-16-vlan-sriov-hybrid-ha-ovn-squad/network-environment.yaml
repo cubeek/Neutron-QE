@@ -2,6 +2,8 @@ resource_registry:
   # Specify the relative/absolute path to the config files you want to use for override the default.
   OS::TripleO::ComputeSriov::Net::SoftwareConfig: nic-configs/compute.yaml
   OS::TripleO::ControllerSriov::Net::SoftwareConfig: nic-configs/controller.yaml
+  OS::TripleO::NodeUserData: /usr/share/openstack-tripleo-heat-templates/firstboot/userdata_root_password.yaml
+
 parameter_defaults:
   # Customize all these values to match the local environment
   InternalApiNetCidr: 10.20.1.0/24
@@ -56,19 +58,22 @@ parameter_defaults:
   ComputeSriovSchedulerHints:
     'capabilities:node': 'compute-%index%'
 
+  # Internal QE setting, might not be suitable for production deployments.
+  # Set root password on overcloud nodes
+  NodeRootPassword: '12345678'
 
 #### Extras ####
   NovaPCIPassthrough:
-    - devname: "enp6s0f3"
-      trusted: "true"
-      physical_network: "datacentre"
     - devname: "enp7s0f3"
       trusted: "true"
       physical_network: "datacentre"
+    - devname: "enp5s0f0"
+      trusted: "true"
+      physical_network: "datacentre"
 
-  NeutronPhysicalDevMappings: "datacentre:enp6s0f3,datacentre:enp7s0f3"
+  NeutronPhysicalDevMappings: "datacentre:enp7s0f3,datacentre:enp5s0f0"
   NeutronSupportedPCIVendorDevs: ['8086:154c', '8086:1572']
-  NeutronSriovNumVFs: ["enp6s0f3:5", "enp7s0f3:5"]
+  NeutronSriovNumVFs: ["enp7s0f3:5", "enp5s0f0:5"]
   ComputeSriovParameters:
     KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=32 iommu=pt intel_iommu=on"
     TunedProfileName: "cpu-partitioning"
