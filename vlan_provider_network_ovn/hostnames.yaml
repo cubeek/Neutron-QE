@@ -1,0 +1,6 @@
+parameter_defaults:
+    CloudDomain: redhat.local
+
+    ComputeHostnameFormat: 'compute-%index%'
+    ControllerHostnameFormat: 'controller-%index%'
+    NetworkerHostnameFormat: 'networker-%index%'

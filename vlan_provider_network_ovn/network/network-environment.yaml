@@ -1,0 +1,33 @@
+---
+parameter_defaults:
+    ExternalNetCidr: '10.218.0.0/24'
+    ExternalAllocationPools: [{'start': '10.218.0.101', 'end': '10.218.0.149'}]
+    ExternalInterfaceDefaultRoute: '10.218.0.10'
+    ExternalNetworkVlanID: 218
+    PublicVirtualFixedIPs: [{"ip_address":"10.218.0.101"}]
+    InternalApiNetCidr: '172.17.1.0/24'
+    InternalApiAllocationPools: [{'start': '172.17.1.10', 'end': '172.17.1.149'}]
+    InternalApiNetworkVlanID: 20
+    StorageNetCidr: '172.17.3.0/24'
+    StorageAllocationPools: [{'start': '172.17.3.10', 'end': '172.17.3.149'}]
+    StorageNetworkVlanID: 30
+    StorageMgmtNetCidr: '172.17.4.0/24'
+    StorageMgmtAllocationPools: [{'start': '172.17.4.10', 'end': '172.17.4.149'}]
+    StorageMgmtNetworkVlanID: 40
+    TenantNetCidr: '172.17.2.0/24'
+    TenantAllocationPools: [{'start': '172.17.2.10', 'end': '172.17.2.149'}]
+    TenantNetworkVlanID: 50
+    DnsServers: ['10.0.0.1', '172.16.0.1']
+    ControlPlaneDefaultRoute: '192.168.24.1'
+    EC2MetadataIp: '192.168.24.1'
+    ControlPlaneSubnetCidr: "24"
+    NtpServer: ["clock1.rdu2.redhat.com"]
+    NeutronBridgeMappings: "datacentre:br-ex,tenant:br-isolated"
+    NeutronNetworkVLANRanges: "tenant:1000:2000,datacentre:218:218"
+    NeutronNetworkType: 'geneve,vlan'
+    NeutronTypeDrivers: 'geneve,vlan'
+    NeutronExternalNetworkBridge: ''
+    NeutronTunnelTypes: 'geneve,vlan'
+    NetworkerParameters:
+        OVNCMSOptions: "enable-chassis-as-gw"
+
