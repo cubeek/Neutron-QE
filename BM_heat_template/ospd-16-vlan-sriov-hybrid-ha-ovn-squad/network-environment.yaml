@@ -62,6 +62,9 @@ parameter_defaults:
   # Set root password on overcloud nodes
   NodeRootPassword: '12345678'
 
+  NovaSchedulerDefaultFilters: ['RetryFilter','AvailabilityZoneFilter','ComputeFilter','ComputeCapabilitiesFilter','DifferentHostFilter', 'ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
+  NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
+
 #### Extras ####
   NovaPCIPassthrough:
     - devname: "enp7s0f3"
