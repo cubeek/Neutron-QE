@@ -1,0 +1,14 @@
+parameter_defaults:
+   ComputeCount: 2
+   OvercloudComputeFlavor: compute
+   ControllerCount: 3
+   OvercloudControllerFlavor: controller
+   NetworkerCount: 2
+   OvercloudNetworkerFlavor: networker
+
+resource_registry:
+    OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/vlan_provider_network_ovn/network/nic-configs/16/controller.yaml
+    OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/vlan_provider_network_ovn/network/nic-configs/16/compute.yaml
+    OS::TripleO::Networker::Net::SoftwareConfig: /home/stack/vlan_provider_network_ovn/network/nic-configs/16/networker.yaml
+
+
