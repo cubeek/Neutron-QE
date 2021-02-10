@@ -62,9 +62,6 @@ parameter_defaults:
   # Set root password on overcloud nodes
   NodeRootPassword: '12345678'
 
-  NovaSchedulerDefaultFilters: ['RetryFilter','AvailabilityZoneFilter','ComputeFilter','ComputeCapabilitiesFilter','DifferentHostFilter', 'ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
-  NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
-
 #### Extras ####
   NovaPCIPassthrough:
     - devname: "enp7s0f3"
@@ -74,6 +71,8 @@ parameter_defaults:
       trusted: "true"
       physical_network: "datacentre"
 
+  NovaSchedulerDefaultFilters: ['RetryFilter','AvailabilityZoneFilter','ComputeFilter','ComputeCapabilitiesFilter','DifferentHostFilter', 'ImagePropertiesFilter','ServerGroupAntiAffinityFilter','ServerGroupAffinityFilter','PciPassthroughFilter']
+  NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
   NeutronPhysicalDevMappings: "datacentre:enp7s0f3,datacentre:enp5s0f0"
   NeutronSupportedPCIVendorDevs: ['8086:154c', '8086:1572']
   NeutronSriovNumVFs: ["enp7s0f3:5", "enp5s0f0:5"]
