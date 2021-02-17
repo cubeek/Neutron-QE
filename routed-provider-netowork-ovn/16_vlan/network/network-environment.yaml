@@ -1,0 +1,128 @@
+parameter_defaults:
+    BondInterfaceOvsOptions: bond_mode=active-backup
+    #Enable isolated metadata for provider networks
+    NeutronEnableIsolatedMetadata: 'True'
+    Compute0Parameters:
+        NeutronBridgeMappings:
+        - leaf0:br-ex
+    Compute1Parameters:
+        NeutronBridgeMappings:
+        - leaf1:br-ex
+    Compute2Parameters:
+        NeutronBridgeMappings:
+        - leaf2:br-ex
+    ControlPlaneSubnet: leaf0
+    Controller0Parameters:
+        NeutronBridgeMappings:
+        - leaf0:br-ex
+    DnsServers:
+    - 10.11.5.19
+    - 10.5.30.160
+    ExternalAllocationPools:
+    -   end: 10.0.10.149
+        start: 10.0.10.101
+    ExternalAllocationPools_external_leaf1:
+    -   end: 10.0.20.149
+        start: 10.0.20.101
+    ExternalAllocationPools_external_leaf2:
+    -   end: 10.0.30.149
+        start: 10.0.30.101
+    ExternalInterfaceDefaultRoute: 10.0.10.1
+    ExternalInterfaceDefaultRoute_external_leaf1: 10.0.20.1
+    ExternalInterfaceDefaultRoute_external_leaf2: 10.0.30.1
+    ExternalNetCidr: 10.0.10.0/24
+    ExternalNetCidr_external_leaf1: 10.0.20.0/24
+    ExternalNetCidr_external_leaf2: 10.0.30.0/24
+    ExternalNetworkVlanID: 10
+    ExternalNetworkVlanID_external_leaf1: 20
+    ExternalNetworkVlanID_external_leaf2: 30
+    InternalApiAllocationPools:
+    -   end: 172.25.1.250
+        start: 172.25.1.4
+    InternalApiInterfaceDefaultRoute: 172.25.1.254
+    InternalApiNetCidr: 172.25.1.0/24
+    InternalApiNetworkVlanID: 1185
+    NeutronEnableDVR: 'false'
+    NeutronExternalNetworkBridge: ''
+    NeutronFlatNetworks: leaf0,leaf1,leaf2
+    NeutronNetworkType: 'geneve,vlan'
+    NeutronNetworkVLANRanges: leaf0:1:1000,leaf1:1:1000,leaf2:1:1000
+    NeutronTunnelTypes: 'geneve,vlan'
+    NeutronTypeDrivers: 'geneve,vlan'
+    NovaComputeAvailabilityZone: az-central
+    NovaComputeLibvirtType: qemu
+    NtpServer:
+    - clock.redhat.com
+    - clock2.redhat.com
+    PythonInterpreter: /usr/bin/python3
+    RootStackName: central
+    SELinuxMode: permissive
+    StorageAllocationPools:
+    -   end: 172.23.1.250
+        start: 172.23.1.4
+    StorageInterfaceDefaultRoute: 172.23.1.254
+    StorageMgmtAllocationPools:
+    -   end: 172.18.1.250
+        start: 172.18.1.4
+    StorageMgmtInterfaceDefaultRoute: 172.18.1.254
+    StorageMgmtNetCidr: 172.18.1.0/24
+    StorageMgmtNetworkVlanID: 1188
+    StorageNetCidr: 172.23.1.0/24
+    StorageNetworkVlanID: 1183
+    TenantAllocationPools:
+    -   end: 172.19.1.250
+        start: 172.19.1.4
+    TenantInterfaceDefaultRoute: 172.19.1.254
+    TenantNetCidr: 172.19.1.0/24
+    TenantNetPhysnetMtu: 1500
+    TenantNetworkVlanID: 1189
+    VipSubnetMap:
+        ctlplane: leaf0
+    StorageMgmtSubnetCidr_storage_mgmt_leaf2: '172.18.3.0/24'
+    StorageMgmtAllocationPools_storage_mgmt_leaf2: [{'start': '172.18.3.4', 'end': '172.18.3.250'}]
+    StorageMgmtInterfaceDefaultRoute_storage_mgmt_leaf2: '172.18.3.254'
+    StorageMgmtNetworkVlanID_storage_mgmt_leaf2: 1168
+
+    StorageSubnetCidr_storage_leaf2: '172.23.3.0/24'
+    StorageAllocationPools_storage_leaf2: [{'start': '172.23.3.4', 'end': '172.23.3.250'}]
+    StorageInterfaceDefaultRoute_storage_leaf2: '172.23.3.254'
+    StorageNetworkVlanID_storage_leaf2: 1163
+  
+    InternalApiSubnetCidr_internal_api_leaf2: '172.25.3.0/24'
+    InternalApiAllocationPools_internal_api_leaf2: [{'start': '172.25.3.4', 'end': '172.25.3.250'}]
+    InternalApiInterfaceDefaultRoute_internal_api_leaf2: '172.25.3.254'
+    InternalApiNetworkVlanID_internal_api_leaf2: 1165
+  
+    TenantSubnetCidr_tenant_leaf2: '172.19.3.0/24'
+    TenantAllocationPools_tenant_leaf2: [{'start': '172.19.3.4', 'end': '172.19.3.250'}]
+    TenantInterfaceDefaultRoute_tenant_leaf2: '172.19.3.254'
+    TenantNetworkVlanID_tenant_leaf2: 1169
+  
+    StorageSubnetCidr_storage_leaf1: '172.23.2.0/24'
+    StorageAllocationPools_storage_leaf1: [{'start': '172.23.2.4', 'end': '172.23.2.250'}]
+    StorageInterfaceDefaultRoute_storage_leaf1: '172.23.2.254'
+    StorageNetworkVlanID_storage_leaf1: 1173
+  
+    StorageMgmtSubnetCidr_storage_mgmt_leaf1: '172.18.2.0/24'
+    StorageMgmtAllocationPools_storage_mgmt_leaf1: [{'start': '172.18.2.4', 'end': '172.18.2.250'}]
+    StorageMgmtInterfaceDefaultRoute_storage_mgmt_leaf1: '172.18.2.254'
+    StorageMgmtNetworkVlanID_storage_mgmt_leaf1: 1178
+  
+    InternalApiSubnetCidr_internal_api_leaf1: '172.25.2.0/24'
+    InternalApiAllocationPools_internal_api_leaf1: [{'start': '172.25.2.4', 'end': '172.25.2.250'}]
+    InternalApiInterfaceDefaultRoute_internal_api_leaf1: '172.25.2.254'
+    InternalApiNetworkVlanID_internal_api_leaf1: 1175
+  
+    TenantSubnetCidr_tenant_leaf1: '172.19.2.0/24'
+    TenantAllocationPools_tenant_leaf1: [{'start': '172.19.2.4', 'end': '172.19.2.250'}]
+    TenantInterfaceDefaultRoute_tenant_leaf1: '172.19.2.254'
+    TenantNetworkVlanID_tenant_leaf1: 1179
+
+resource_registry:
+    OS::TripleO::Compute0::Net::SoftwareConfig: nics/compute0.yaml
+    OS::TripleO::Compute1::Net::SoftwareConfig: nics/compute1.yaml
+    OS::TripleO::Compute2::Net::SoftwareConfig: nics/compute2.yaml
+    OS::TripleO::Controller0::Net::SoftwareConfig: nics/controller0.yaml
+    OS::TripleO::Network::Ports::OVNDBsVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
+    OS::TripleO::Network::Ports::RedisVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
+    OS::TripleO::Services::Docker: OS::Heat::None
